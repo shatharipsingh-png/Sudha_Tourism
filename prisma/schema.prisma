@@ -1,0 +1,204 @@
+// ---------------------------------------------------------------------------
+// Sudha Tourism — Prisma Schema
+// North India travel booking platform. Everything the site renders is
+// data-driven from these models — no hardcoded destinations/packages/images.
+// ---------------------------------------------------------------------------
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================== ADMIN AUTH ==================================
+// Single-role admin auth (NextAuth Credentials + JWT sessions — no adapter
+// tables required). Only staff sign in; travellers never need an account.
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  active       Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============================== CATALOG =====================================
+
+model Destination {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  description      String   @db.Text
+  shortDescription String
+  image            String
+  gallery          String[]
+  bestTimeToVisit  String
+  attractions      String[]
+  region           String // Rajasthan | Uttarakhand | Himachal Pradesh | Delhi | Punjab
+  active           Boolean  @default(true)
+
+  packages Package[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([region])
+}
+
+enum TravelType {
+  Family
+  Adventure
+  Honeymoon
+  Spiritual
+  Wildlife
+  Cultural
+  Luxury
+}
+
+model Package {
+  id             String       @id @default(cuid())
+  name           String
+  slug           String       @unique
+  description    String       @db.Text
+  destinationId  String
+  destination    Destination  @relation(fields: [destinationId], references: [id])
+  durationDays   Int
+  durationNights Int
+  price          Int
+  discountPrice  Int?
+  image          String
+  gallery        String[]
+  travelTypes    TravelType[]
+  highlights     String[]
+  inclusions     String[]
+  exclusions     String[]
+  active         Boolean      @default(true)
+  featured       Boolean      @default(false)
+
+  // Display-only aggregate rating shown on package hero/cards.
+  rating      Float @default(4.8)
+  reviewCount Int   @default(24)
+
+  itinerary Itinerary[]
+  enquiries Enquiry[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([destinationId])
+  @@index([active, featured])
+}
+
+model Itinerary {
+  id          String  @id @default(cuid())
+  packageId   String
+  package     Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  day         Int
+  title       String
+  description String  @db.Text
+  activities  String[]
+
+  @@unique([packageId, day])
+}
+
+model Experience {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  category    String // Adventure | Spiritual | Wildlife | Culture | Food | Photography
+  description String  @db.Text
+  image       String
+  active      Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([category])
+}
+
+// ============================== LEADS / CRM =================================
+
+enum EnquiryStatus {
+  New
+  Contacted
+  FollowUp
+  Confirmed
+  Cancelled
+  Completed
+}
+
+model Enquiry {
+  id           String        @id @default(cuid())
+  referenceNo  String        @unique
+  name         String
+  email        String
+  phone        String
+  packageId    String?
+  package      Package?      @relation(fields: [packageId], references: [id])
+  travelDate   DateTime
+  adults       Int           @default(1)
+  children     Int           @default(0)
+  message      String?       @db.Text
+  status       EnquiryStatus @default(New)
+  adminNotes   String?       @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([packageId])
+}
+
+enum ContactStatus {
+  New
+  Read
+  Responded
+}
+
+model ContactMessage {
+  id      String        @id @default(cuid())
+  name    String
+  email   String
+  phone   String?
+  message String        @db.Text
+  status  ContactStatus @default(New)
+
+  createdAt DateTime @default(now())
+}
+
+model NewsletterSubscriber {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  subscribedAt DateTime @default(now())
+  active       Boolean  @default(true)
+}
+
+// ============================== CONTENT =====================================
+
+model BlogPost {
+  id            String    @id @default(cuid())
+  title         String
+  slug          String    @unique
+  excerpt       String
+  content       String    @db.Text
+  featuredImage String
+  category      String
+  author        String
+  publishedAt   DateTime?
+  published     Boolean   @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([published])
+}

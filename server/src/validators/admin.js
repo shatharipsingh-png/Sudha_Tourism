@@ -1,14 +1,15 @@
 import { z } from 'zod';
+import { page } from './common.js';
 
 export const loginSchema = z.object({
   email: z.string().trim().email().max(320),
-  password: z.string().min(1).max(200)
+  password: z.string().min(1).max(72).refine((value) => Buffer.byteLength(value, 'utf8') <= 72, 'Password too long.')
 });
 
 export const adminLeadsQuerySchema = z.object({
   type: z.enum(['enquiry','booking','contact','newsletter']).optional(),
   status: z.enum(['new','contacted','closed']).optional(),
-  page: z.coerce.number().int().min(1).default(1),
+  page,
   limit: z.coerce.number().int().min(1).max(50).default(20)
 });
 

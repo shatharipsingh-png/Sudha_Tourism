@@ -1,100 +1,121 @@
-# Sudha Tourism (foundation scaffold)
+# Sudha Tourism
 
-Premium Himalayan travel platform — this is **phase 1: foundation**. It wires up
-the project so every subsequent feature (packages, booking, dashboards, admin)
-can be built on solid, consistent ground.
+Current: **server/ = Node + Express 4 + JavaScript + mysql2/promise + MySQL 8+**.
+Upcoming: **client/ = React + Vite + JavaScript + CSS Modules**. No client is built in Phase 1.
+Reusable draft copy and UI ideas are preserved in [project notes](docs/preserved-project-notes.md); these include unverified placeholders, not approved business facts.
 
-> The name "Sudha Tourism" is a placeholder. Rebrand by editing
-> `src/config/site.ts` and the color tokens in `src/app/globals.css` —
-> no other code needs to change.
+## Requirements and local setup
 
-## What's in this phase
+Node 20+, npm and MySQL Community Server 8+; local target MySQL 8.4.11. Database commands reject MySQL <8 and MariaDB. The backend owns its package/lockfile; run commands from server/. On Windows with PowerShell script restrictions, use npm.cmd.
 
-- Next.js 15 (App Router) + React 19 + TypeScript (strict)
-- Tailwind CSS v4 design system: brand colors (forest green / emerald / warm
-  gold / off-white), typography (Geist + Inter), radii, shadows, motion
-  tokens, and a dark mode palette — all as CSS variables in `globals.css`
-- Prisma schema covering: auth (Auth.js-compatible User/Account/Session),
-  roles & permissions, packages, itineraries, destinations, categories,
-  bookings, payments, invoices, coupons, reviews, blog, FAQs, media,
-  volunteer events, wishlist, enquiries, notifications, settings, audit logs
-- ESLint (flat config) + Prettier (with Tailwind class sorting) + Husky +
-  lint-staged pre-commit hook
-- `.env.example` covering DB, Auth.js, Cloudinary, Razorpay, Resend
-- A minimal home page proving the design tokens render correctly
-
-## Not yet built (next phases)
-
-Home page sections, package listing/detail, booking + payment flow,
-destinations, gallery, reviews, blog, volunteer pages, user dashboard, admin
-dashboard, auth screens, email templates, animation system (Framer
-Motion/GSAP/Lenis/Three.js), and SEO/sitemap wiring. The schema and folder
-structure below are designed so each of these slots in without refactoring.
-
-## Getting started
-
-```bash
-# 1. Install dependencies
+```sh
+cd server
 npm install
-
-# 2. Copy env template and fill in real values
 cp .env.example .env
+# PowerShell: Copy-Item .env.example .env
+```
 
-# 3. Point DATABASE_URL at a running PostgreSQL instance, then:
-npm run db:push       # push schema (or use db:migrate for versioned migrations)
-npm run db:seed       # seed roles, categories, and a sample package
+Edit the ignored server/.env privately. Set DB_HOST, DB_PORT (3306), DB_USER, DB_PASSWORD, DB_NAME (sudha_tourism).
+Set CLIENT_URL to an exact browser origin (development http://localhost:5173; no trailing slash).
+PORT defaults to 5000. Generate two separate random secrets:
+```sh
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+Use one for JWT_SECRET (32+ characters), another for IP_SALT (16+). Never commit credentials. ADMIN_EMAIL/ADMIN_PASSWORD are seed-only and are not required to start the API.
 
-# 4. Run the dev server
+## Initialization, migrations and seed
+
+**Initialization != migration != seed.**
+
+Initialization creates the database only:
+```sh
+npm run db:init
+```
+This needs database-creation privileges. Alternatively an operator can execute:
+```sql
+CREATE DATABASE IF NOT EXISTS sudha_tourism CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+Use separate restricted runtime/migration accounts in production. Runtime needs SELECT/INSERT/UPDATE on application tables; migration accounts need appropriate DDL and schema_migrations access.
+
+Migrations create/extend schema:
+```sh
+npm run migrate
+npm run migrate
+```
+Files in server/src/db/migrations execute sequentially under a MySQL advisory lock. Successful files/checksums are stored in schema_migrations; failed files are not marked successful. Repeated successful runs are safe. Changed/missing applied files or out-of-order additions fail. Migration 001 adopts the original five-table schema with CREATE TABLE IF NOT EXISTS, preserving records. Existing tables must match that original schema.
+SQL files use -- statement-breakpoint between statements. The runner accepts additive CREATE TABLE/ALTER TABLE and rejects obvious destructive operations. Review future migrations and back up production.
+[MySQL DDL implicitly commits](https://dev.mysql.com/doc/refman/8.4/en/implicit-commit.html); multi-statement DDL cannot be transactionally rolled back. Initial creation is retryable; 002 is one atomic ALTER. If a connection/process fails after DDL but before tracking, inspect schema and ledger before retrying; do not recover by dropping tables.
+
+Seed inserts missing catalog/admin records:
+```sh
+npm run seed
+npm run seed
+```
+**Seed is non-destructive**: no table creation/deletion, no lead deletion, no duplicate catalog records, no overwriting owner edits or existing admin passwords. It requires migrations first and uses a transaction.
+With neither ADMIN_EMAIL nor ADMIN_PASSWORD, seed is catalog-only. To create an admin supply both; password 12+ characters and <=72 UTF-8 bytes. A partial pair fails. Remove seed credentials after use. Existing catalog prices are demo data; verify before launch.
+
+Migration 002 adds consent_at, unsubscribed_at and a generated normalized newsletter_email unique key. Legacy duplicate emails cause an atomic failure, preserving all records. Find duplicates privately:
+```sql
+SELECT LOWER(TRIM(email)) AS normalized_email, COUNT(*) AS count
+FROM leads WHERE type = 'newsletter'
+GROUP BY LOWER(TRIM(email)) HAVING COUNT(*) > 1;
+```
+Back up and manually review/archive/reconcile duplicates with an explicit retention decision, then retry. No automatic deletion or invented historical consent occurs. Existing consent timestamps remain NULL. This is minimal consent infrastructure, not legal compliance.
+
+## Development and tests
+
+```sh
 npm run dev
+npm start
+npm test
 ```
+Development uses Node watch mode; production uses start.
+Tests preload isolated values, skip .env and prohibit real pool query/connection access. In-memory replacements cover HTTP validation/auth/errors, pagination, proxy rate limits, readiness, migration tracking and seed safety. No production credentials or DB writes are needed; these do not replace MySQL integration tests.
+With a configured development database, run migrate twice and seed twice; compare lead/catalog counts, start the API and check liveness/readiness. Do not verify against production. Checks without credentials remain UNVERIFIED.
 
-Visit `http://localhost:3000` — you should see the branded placeholder home
-page rendering with the design system tokens applied.
+## API
 
-### Useful scripts
+All responses use { success, data, message }; validation errors have data.errors.
 
-| Command             | Purpose                                   |
-| -------------------- | ------------------------------------------ |
-| `npm run dev`         | Start dev server (Turbopack)                |
-| `npm run build`       | Production build                            |
-| `npm run lint`        | Lint the codebase                           |
-| `npm run typecheck`   | TypeScript check with no emit               |
-| `npm run db:studio`   | Open Prisma Studio to browse data           |
-| `npm run db:migrate`  | Create/apply a versioned migration          |
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | /api/health | Lightweight liveness, no DB query |
+| GET | /api/health/ready | SELECT 1; ready/connected or generic 503 |
+| GET | /api/destinations | Destination list |
+| GET | /api/destinations/:slug | Destination and published packages |
+| GET | /api/packages | Filtered/paginated published packages |
+| GET | /api/packages/:slug | Detail and related packages |
+| GET | /api/experiences | Experiences |
+| POST | /api/leads | Unified enquiry/booking/contact/newsletter |
+| POST | /api/admin/login | Sign-in |
+| POST | /api/admin/logout | Authenticated cookie clearing |
+| GET | /api/admin/me | Authenticated administrator |
+| GET | /api/admin/leads | Authenticated paginated lead list |
+| GET | /api/admin/stats | newLeadsByType, publishedPackages, totalDestinations |
+| PATCH | /api/admin/leads/:id | Authenticated status update |
 
-## Folder structure
+Package filters: destination slug; category family/adventure/honeymoon/spiritual/cultural/wildlife/luxury; duration short (<=4), medium (5–7), long (>=8); minPrice/maxPrice; best_seller/featured true/false; page 1–100000; limit 1–24, default 12.
+Admin leads: type; status new/contacted/closed; page 1–100000; limit 1–50, default 20.
+Pagination passes bounded integers through mysql2 query() text protocol, avoiding prepared LIMIT binding issues; other SQL uses execute(). [mysql2 documentation](https://sidorares.github.io/node-mysql2/docs/documentation)
 
-```
-src/
-  app/                 # App Router routes (pages, layouts, route handlers)
-  components/
-    ui/                # shadcn/ui primitives (button, card, dialog, ...)
-    layout/             # header, footer, nav — shared shell
-    shared/              # cross-feature components (booking card, etc.)
-  config/
-    site.ts            # brand name, nav, contact info, categories — edit to rebrand
-  lib/
-    prisma.ts           # Prisma client singleton
-    fonts.ts            # Geist + Inter font loading
-    utils.ts            # cn(), formatCurrency(), slugify(), etc.
-  hooks/                # shared React hooks
-  types/                # shared TypeScript types
-prisma/
-  schema.prisma         # full data model
-  seed.ts               # dev seed data
-```
+Lead input:
+- enquiry: name/email/phone; optional package_id, destination_id, travel_date, travelers (1–50), message; details allows duration, budget, travel_type.
+- booking: name/email/phone, published package_id, future YYYY-MM-DD date and travelers required; details allows room_preference single/double/triple/family. Dates use UTC calendar days; today is rejected.
+- contact: name/email, message 10–2000 characters; optional phone.
+- newsletter: email and consent: true. First/duplicate/concurrent submissions return identical id: null responses; no subscriber ID disclosure or resetting unsubscribe history.
+- website is a honeypot. Blank optional strings become undefined. Details reject unknown keys. Route slugs, IDs and dates are validated.
 
-As features are added, each domain (packages, bookings, blog, admin, etc.)
-gets its own route group under `src/app/` and, where it has enough
-domain-specific logic, a matching folder under `src/components/` — keeping
-the codebase feature-based rather than one giant shared `components/` bucket.
+No legacy contact/enquiries/newsletter endpoints, confirmed booking or payment functionality exists.
 
-## Tech stack reference
+## Authentication, security and production
 
-Frontend: Next.js 15, React 19, TypeScript, Tailwind v4, shadcn/ui, Radix UI,
-Framer Motion, GSAP, Lenis, Three.js/React Three Fiber/Drei, Lucide icons.
+bcrypt 6 (cost 12) replaces the vulnerable legacy installer dependencies ([release notes](https://github.com/kelektiv/node.bcrypt.js/releases/tag/v6.0.0)); unknown accounts still perform bcrypt work. Login errors: Invalid email or password. JWT signing/verification explicitly uses HS256, eight-hour expiry, HttpOnly/SameSite=Strict cookie, Secure in production. Protected routes recheck the admin in MySQL. Logout clears the cookie; a copied JWT remains valid until expiry. No OAuth, roles, refresh tokens or reset flow.
 
-Backend: Next.js Server Actions, Prisma ORM, PostgreSQL, Auth.js, Cloudinary,
-Razorpay, Resend, MDX-based blog, Zod + React Hook Form.
+Set NODE_ENV=production, HTTPS and the exact production CLIENT_URL. Deploy frontend/API on the same site for strict cookies. Other browser origins receive 403. There is no separate CSRF-token system; origin checks, strict cookies and HTTPS must be retained.
 
-Deployment target: Vercel.
+TRUST_PROXY defaults to 0. Allow a known hop count 1–10 for a fixed ingress path, or loopback/linklocal/uniquelocal where appropriate. Never use true or trust arbitrary proxies. Restrict direct API access and ensure the proxy overwrites forwarded headers; otherwise clients can spoof IPs or share one rate-limit identity.
+Global: 300 requests/15 minutes/IP; leads: 5/10 minutes/IP; failed logins: 5/15 minutes/IP with skipSuccessfulRequests enabled. Health probes bypass global limits. Stores are process-local; shared storage/edge limits are needed before multiple replicas.
+
+Helmet, 20 KB JSON bodies and bounded DB queues are enabled. Expected statuses: 400/401/403/404/413/429; unsupported encodings 415; unexpected failure generic 500. Logs record method, route template, status and duration, excluding queries, bodies, passwords, cookies, JWTs and SQL internals. IPs are salted hashes.
+SIGTERM/SIGINT close HTTP/pool with a ten-second bound. Fatal exceptions/rejections safely log event names and shut down.
+The pool assumes local/private trusted MySQL networking; remote database TLS is not configured. Configure transport security before an untrusted network, plus secret management, backups and restricted database users.

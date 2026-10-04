@@ -23,6 +23,7 @@ export const leadsRateLimit = rateLimit({
 });
 
 export const loginRateLimit = rateLimit({
+  skipSuccessfulRequests: true,
   windowMs: 15 * 60 * 1000,
   limit: 5,
   standardHeaders: 'draft-7',

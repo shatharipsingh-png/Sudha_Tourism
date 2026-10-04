@@ -8,16 +8,29 @@ import leadRoutes from './routes/leads.js';
 import adminRoutes from './routes/admin.js';
 import { globalRateLimit } from './middleware/rateLimits.js';
 import { notFound, errorHandler } from './middleware/errorHandler.js';
+import { requestLogger } from './middleware/requestLogger.js';
 
 const app = express();
 
 app.disable('x-powered-by');
 app.set('trust proxy', env.TRUST_PROXY);
+app.use(requestLogger);
 app.use(helmet());
-app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || origin === env.CLIENT_URL) return callback(null, true);
+    const error = new Error('Origin not allowed');
+    error.code = 'CORS_REJECTED';
+    return callback(error);
+  },
+  credentials: true
+}));
 app.use(express.json({ limit: '20kb' }));
 app.use(cookieParser());
-app.use(globalRateLimit);
+app.use((req, res, next) => {
+  if (req.method === 'GET' && ['/api/health', '/api/health/ready'].includes(req.path)) return next();
+  return globalRateLimit(req, res, next);
+});
 
 app.use('/api', publicRoutes);
 app.use('/api', leadRoutes);

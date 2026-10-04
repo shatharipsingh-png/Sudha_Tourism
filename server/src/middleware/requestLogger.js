@@ -1,0 +1,13 @@
+export function requestLogger(req, res, next) {
+  const start = performance.now();
+  res.on('finish', () => {
+    // Express clears baseUrl when an error escapes a router. The fixed API
+    // mount prefix keeps error logs accurate without logging supplied values.
+    const path = req.route ? `/api${req.route.path}` : '[unmatched]';
+    console.log(JSON.stringify({
+      method: req.method, path, status: res.statusCode,
+      durationMs: Math.round(performance.now() - start)
+    }));
+  });
+  next();
+}

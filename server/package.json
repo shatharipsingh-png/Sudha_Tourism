@@ -3,15 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
+    "db:init": "node src/db/init.js",
+    "migrate": "node src/db/migrate.js",
     "seed": "node src/db/seed.js",
-    "test": "node --test"
+    "test": "node --import ./test/setup.js --test --test-concurrency=1 test/*.test.js"
   },
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",

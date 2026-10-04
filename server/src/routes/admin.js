@@ -5,9 +5,10 @@ import { loginRateLimit } from '../middleware/rateLimits.js';
 import { validate } from '../middleware/validate.js';
 import { loginSchema, adminLeadsQuerySchema, leadStatusSchema } from '../validators/admin.js';
 import { z } from 'zod';
+import { positiveId } from '../validators/common.js';
 
 const router = Router();
-const idSchema = z.object({ id: z.coerce.number().int().positive() });
+const idSchema = z.object({ id: positiveId });
 
 router.post('/admin/login', loginRateLimit, validate(loginSchema), login);
 router.post('/admin/logout', requireAuth, logout);

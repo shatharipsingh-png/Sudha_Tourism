@@ -1,5 +1,5 @@
 import mysql from 'mysql2/promise';
-import { env } from '../config/env.js';
+import { dbEnv as env } from '../config/database.js';
 
 export const pool = mysql.createPool({
   host: env.DB_HOST,
@@ -9,6 +9,8 @@ export const pool = mysql.createPool({
   database: env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0,
-  charset: 'utf8mb4'
+  queueLimit: 100,
+  connectTimeout: 10000,
+  charset: 'utf8mb4',
+  timezone: 'Z'
 });

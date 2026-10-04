@@ -13,15 +13,17 @@ const cookieOptions = {
   path: '/'
 };
 
+const dummyPasswordHash = bcrypt.hashSync('not-an-admin-password', 12);
+
 export async function login(req, res, next) {
   try {
     const { email, password } = req.body;
     const [rows] = await pool.execute('SELECT id, email, password_hash FROM admins WHERE email = ? LIMIT 1', [email]);
     const admin = rows[0];
-    const valid = admin ? await bcrypt.compare(password, admin.password_hash) : false;
-    if (!valid) return fail(res, 401, 'Invalid credentials');
+    const matches = await bcrypt.compare(password, admin?.password_hash ?? dummyPasswordHash);
+    if (!admin || !matches) return fail(res, 401, 'Invalid email or password');
 
-    const token = jwt.sign({ sub: admin.id }, env.JWT_SECRET, { expiresIn: '8h' });
+    const token = jwt.sign({ sub: String(admin.id) }, env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '8h' });
     res.cookie('st_admin', token, cookieOptions);
     return ok(res, { id: admin.id, email: admin.email }, 'Logged in.');
   } catch (error) { next(error); }
@@ -48,7 +50,8 @@ export async function listLeads(req, res, next) {
 
     const [countRows] = await pool.execute(`SELECT COUNT(*) AS total FROM leads l ${where}`, params);
     const total = Number(countRows[0].total);
-    const [rows] = await pool.execute(`
+    // Text protocol avoids mysql2/MySQL prepared LIMIT binding issues.
+    const [rows] = await pool.query(`
       SELECT l.id, l.type, l.name, l.email, l.phone, l.package_id, l.destination_id, l.travel_date, l.travelers,
              l.details, l.message, l.status, l.created_at, l.updated_at,
              p.title AS package_title, d.name AS destination_name
@@ -56,7 +59,7 @@ export async function listLeads(req, res, next) {
       LEFT JOIN packages p ON p.id = l.package_id
       LEFT JOIN destinations d ON d.id = l.destination_id
       ${where}
-      ORDER BY l.created_at DESC
+      ORDER BY l.created_at DESC, l.id DESC
       LIMIT ? OFFSET ?
     `, [...params, limit, offset]);
 
@@ -75,8 +78,8 @@ export async function stats(req, res, next) {
     const byType = { enquiry: 0, booking: 0, contact: 0, newsletter: 0 };
     for (const row of leadRows) byType[row.type] = Number(row.count);
     return ok(res, {
-      leadsByType: byType,
-      totalPackages: Number(packageRows[0].count),
+      newLeadsByType: byType,
+      publishedPackages: Number(packageRows[0].count),
       totalDestinations: Number(destinationRows[0].count)
     }, 'Stats retrieved.');
   } catch (error) { next(error); }

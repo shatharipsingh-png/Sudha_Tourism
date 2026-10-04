@@ -4,10 +4,6 @@ import { ok, fail } from '../utils/response.js';
 
 const cardFields = `p.id, p.slug, p.title, p.route, p.category, p.duration_days, p.price, p.rating, p.image, p.short_desc, p.best_seller, p.featured, d.name AS destination_name, d.slug AS destination_slug`;
 
-function parseCard(row) {
-  return row;
-}
-
 export async function listPackages(req, res, next) {
   try {
     const { destination, category, duration, minPrice, maxPrice, best_seller, featured, page, limit } = req.query;
@@ -28,9 +24,10 @@ export async function listPackages(req, res, next) {
     const offset = (page - 1) * limit;
     const [countRows] = await pool.execute(`SELECT COUNT(*) AS total FROM packages p JOIN destinations d ON d.id = p.destination_id WHERE ${where}`, params);
     const total = Number(countRows[0].total);
-    const [rows] = await pool.execute(`SELECT ${cardFields} FROM packages p JOIN destinations d ON d.id = p.destination_id WHERE ${where} ORDER BY p.featured DESC, p.best_seller DESC, p.id DESC LIMIT ? OFFSET ?`, [...params, limit, offset]);
+    // Validated integers are escaped by mysql2's text protocol.
+    const [rows] = await pool.query(`SELECT ${cardFields} FROM packages p JOIN destinations d ON d.id = p.destination_id WHERE ${where} ORDER BY p.featured DESC, p.best_seller DESC, p.id DESC LIMIT ? OFFSET ?`, [...params, limit, offset]);
 
-    return ok(res, { items: rows.map(parseCard), page, limit, total, totalPages: Math.ceil(total / limit) }, 'Packages retrieved.');
+    return ok(res, { items: rows, page, limit, total, totalPages: Math.ceil(total / limit) }, 'Packages retrieved.');
   } catch (error) { next(error); }
 }
 

@@ -29,8 +29,10 @@ export async function createLead(req, res, next) {
     }
 
     if (input.type === 'newsletter') {
-      const [existing] = await pool.execute("SELECT id FROM leads WHERE type = 'newsletter' AND email = ? LIMIT 1", [input.email]);
-      if (existing.length) return ok(res, { id: existing[0].id }, 'Lead received.');
+      await pool.execute(`INSERT INTO leads (type, email, consent_at, ip_hash)
+        VALUES ('newsletter', ?, CURRENT_TIMESTAMP, ?)
+        ON DUPLICATE KEY UPDATE id = id`, [input.email, hashIp(req.ip)]);
+      return ok(res, { id: null }, 'Lead received.');
     }
 
     const details = input.details ?? null;

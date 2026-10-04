@@ -1,0 +1,52 @@
+.day {
+  border-bottom: 1px solid var(--color-border);
+}
+.day h3 {
+  margin: 0;
+}
+.day button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 72px 1fr 20px;
+  align-items: center;
+  gap: 20px;
+  text-align: left;
+  padding: 24px 0;
+  background: none;
+  border: 0;
+  font: 500 1.18rem var(--font-heading);
+  color: var(--color-text);
+}
+.number {
+  font: 600 0.72rem var(--font-body);
+  color: var(--color-accent-dark);
+}
+.body {
+  padding: 0 0 24px 92px;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  line-height: 1.85;
+}
+.body p {
+  margin-bottom: 12px;
+}
+.body ul {
+  padding-left: 20px;
+  display: grid;
+  gap: 7px;
+}
+@media (max-width: 600px) {
+  .day button {
+    grid-template-columns: 50px 1fr 20px;
+    gap: 12px;
+    font-size: 1.05rem;
+    padding: 20px 0;
+  }
+  .number {
+    font-size: 0.66rem;
+  }
+  .body {
+    padding-left: 0;
+    font-size: 0.85rem;
+  }
+}

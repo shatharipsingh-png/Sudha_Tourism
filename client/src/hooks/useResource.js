@@ -5,21 +5,28 @@ export function useResource(loader) {
     data: null,
     loading: true,
     error: null,
+    loader: null,
   });
   useEffect(() => {
+    if (!loader) {
+      setState({ data: null, loading: false, error: null, loader });
+      return;
+    }
     const controller = new AbortController();
-    setState((current) => ({ ...current, loading: true, error: null }));
+    setState({ data: null, loading: true, error: null, loader });
     loader(controller.signal)
       .then((data) => {
         if (!controller.signal.aborted)
-          setState({ data, loading: false, error: null });
+          setState({ data, loading: false, error: null, loader });
       })
       .catch((error) => {
         if (!controller.signal.aborted)
-          setState({ data: null, loading: false, error });
+          setState({ data: null, loading: false, error, loader });
       });
     return () => controller.abort();
   }, [loader, version]);
   const retry = useCallback(() => setVersion((value) => value + 1), []);
-  return { ...state, retry };
+  return state.loader === loader
+    ? { ...state, retry }
+    : { data: null, loading: Boolean(loader), error: null, retry };
 }

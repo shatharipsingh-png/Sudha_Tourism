@@ -164,6 +164,36 @@
   color: var(--color-accent-dark);
   padding: 0;
 }
+.contactForm {
+  padding: 36px;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  min-width: 0;
+}
+.contactForm h2 {
+  font-size: 2rem;
+}
+.received {
+  padding: 16px;
+  background: #edf4ee;
+  color: #315741;
+  font-size: 0.85rem;
+  border-radius: 8px;
+}
+.note a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 540px) {
+  .contactForm {
+    padding: 24px;
+  }
+  .contactForm h2 {
+    font-size: 1.7rem;
+  }
+}
 .honeypot {
   position: absolute;
   left: -10000px;

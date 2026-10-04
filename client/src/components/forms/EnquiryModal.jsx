@@ -10,7 +10,7 @@ import styles from "./Forms.module.css";
 export default function EnquiryModal() {
   const { open, context, closeEnquiry } = useEnquiry();
   const ref = useDialog(open, closeEnquiry);
-  const destinations = useResource(getDestinations);
+  const destinations = useResource(open ? getDestinations : null);
   const [values, setValues] = useState({});
   const [errors, setErrors] = useState({});
   const [state, setState] = useState({
@@ -38,7 +38,7 @@ export default function EnquiryModal() {
         : "",
       travel_date: "",
       travelers: "",
-      message: "",
+      message: context.message || "",
       travel_type: context.travelType || "",
       budget: "",
       website: "",
@@ -120,7 +120,9 @@ export default function EnquiryModal() {
       {state.success ? (
         <div className={styles.success} role="status">
           <Check size={40} aria-hidden="true" />
-          <h2 id="enquiry-title" tabIndex={-1}>A new journey begins.</h2>
+          <h2 id="enquiry-title" tabIndex={-1}>
+            A new journey begins.
+          </h2>
           <p>
             Your enquiry has been received. Thank you for sharing your plans
             with us.
@@ -137,6 +139,11 @@ export default function EnquiryModal() {
           {context?.packageId && (
             <p className={styles.context}>
               Enquiry for {context.packageTitle || "your selected package"}.
+            </p>
+          )}
+          {context?.destinationName && !context?.packageId && (
+            <p className={styles.context}>
+              Enquiry for {context.destinationName}.
             </p>
           )}
           <form onSubmit={submit} noValidate={false}>

@@ -62,3 +62,10 @@ export const getFeaturedPackages = (signal) =>
   api("/api/packages?featured=true&limit=3", { signal });
 export const submitLead = (body, signal) =>
   api("/api/leads", { method: "POST", body, signal });
+export const getDestination = (slug, signal) =>
+  api(`/api/destinations/${encodeURIComponent(slug)}`, { signal });
+export const getPackages = (query, signal) =>
+  api(`/api/packages?${query}`, { signal });
+export const getPackage = (slug, signal) =>
+  api(`/api/packages/${encodeURIComponent(slug)}`, { signal });
+export const getExperiences = (signal) => api("/api/experiences", { signal });

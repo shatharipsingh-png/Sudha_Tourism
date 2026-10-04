@@ -15,15 +15,32 @@ export function useDialog(open, onClose) {
     dialog.addEventListener("cancel", cancel);
     const trapFocus = (event) => {
       if (event.key !== "Tab") return;
-      const controls = [...dialog.querySelectorAll("a[href], button, input, select, textarea, [tabindex]")]
-        .filter(element => element.tabIndex >= 0 && !element.matches(":disabled") && element.getClientRects().length);
+      const controls = [
+        ...dialog.querySelectorAll(
+          "a[href], button, input, select, textarea, [tabindex]",
+        ),
+      ].filter(
+        (element) =>
+          element.tabIndex >= 0 &&
+          !element.matches(":disabled") &&
+          element.getClientRects().length,
+      );
       const first = controls[0];
       const last = controls.at(-1);
-      if (!first) { event.preventDefault(); dialog.focus(); return; }
-      if (!dialog.contains(document.activeElement) || (event.shiftKey && document.activeElement === first)) {
-        event.preventDefault(); (event.shiftKey ? last : first).focus();
+      if (!first) {
+        event.preventDefault();
+        dialog.focus();
+        return;
+      }
+      if (
+        !dialog.contains(document.activeElement) ||
+        (event.shiftKey && document.activeElement === first)
+      ) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
       } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault(); first.focus();
+        event.preventDefault();
+        first.focus();
       }
     };
     dialog.addEventListener("keydown", trapFocus);

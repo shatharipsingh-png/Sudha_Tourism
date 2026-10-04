@@ -1,10 +1,10 @@
 # Sudha Tourism
 
 Current: **server/ = Node + Express 4 + JavaScript + mysql2/promise + MySQL 8+**.
-Public frontend: **client/ = React + Vite + JavaScript + CSS Modules**. Phase 3 provides Home, shared components and intentional placeholders for Phase 4 pages.
+Public frontend: **client/ = React + Vite + JavaScript + CSS Modules**. All public routes are implemented through Phase 4; backend contracts remain unchanged.
 Reusable draft copy and UI ideas are preserved in [project notes](docs/preserved-project-notes.md); these include unverified placeholders, not approved business facts.
 
-## Public frontend (Phase 3)
+## Public frontend (Phase 4)
 
 Use Node **20.19+ in the Node 20 line, or 22.12+** for Vite 8. The backend remains compatible with Node 20+.
 Start the API and frontend in separate terminals:
@@ -30,17 +30,23 @@ npm run build
 npm run preview
 ```
 
-`npm test` uses Node's built-in test runner for API error handling and lead payload mapping. Playwright is a development-only dependency for browser verification. With the API and Vite running, install its browser once using `npx playwright install chromium`, then run `npm run test:browser`. Alternatively set `CHROMIUM_PATH` to an existing compatible Chrome executable. The browser smoke check is read-only and covers responsive layout, dialogs, planner URLs, safe error/retry and 404 metadata. `VERIFY_URL` optionally selects another local frontend origin. `npm run preview` serves the built files locally; it is not a production server.
+`npm test` uses Node's built-in test runner for API error handling, URL filters/pagination, destination filtering and lead payload validation. Playwright is a development-only dependency for browser verification. With the API and Vite running, install its browser once using `npx playwright install chromium`, then run `npm run test:browser`. Alternatively set `CHROMIUM_PATH` to an existing compatible Chrome executable. The browser check uses the seeded public catalog and intercepts form POST requests: it does not write database records. It covers all public routes at four widths, filters and browser history, pagination, context, keyboard dialogs/itinerary, form payloads and safe error/retry. `VERIFY_URL` optionally selects another local frontend origin. `npm run preview` serves the built files locally; it is not a production server.
 
 Production should serve `client/dist` with SPA fallback to `index.html` for frontend routes, and reverse-proxy `/api` to Express on the same public origin. The Vite development proxy is not part of the production build. Do not route `/api` errors to the SPA fallback. Use HTTPS and set the backend's `CLIENT_URL` to the real public origin.
 
 Update **client/src/config/site.js** with approved phone, email, address, hours, WhatsApp, social URLs, stats and `canonicalOrigin`. Unknown values are explicitly `PLACEHOLDER`; unconfigured contact links, stats and WhatsApp are hidden. Canonical tags are omitted until a real origin is supplied. Replace development Unsplash images with approved imagery before launch, and review seeded package prices/content. No logo, ratings, testimonials or business statistics have been invented.
 
-Home and 404 are implemented. Destination/package lists and details, Experiences, About, Contact, Privacy, Terms and Cancellation are intentional placeholders for Phase 4. The planner saves supported filters in the packages URL; results belong to Phase 4. Legal pages need approved policies before a public launch.
+Home, destination/package lists and details, Experiences, About, Contact, Privacy, Terms, Cancellation and 404 are implemented. Catalog content comes from the existing public APIs. The packages URL is the filter source of truth; filtering resets `page`, pagination preserves active filters, and Back/Forward restores selections. Duration values are `short` (1–4 days), `medium` (5–7 days) and `long` (8+ days). The list requests six packages per page by default; a valid URL `limit` may specify 1–24. Pagination is performed by MySQL through the API.
+
+**Pricing assumption:** the existing schema stores integer prices without currency or pricing-unit columns. The frontend follows the Phase 3/catalog assumption of INR starting prices per person. The business must verify that assumption and all listed prices before launch; no multi-currency or confirmed-quote feature is introduced. Missing prices display an enquiry/contact message.
+
+Legal routes are readable **review-required templates**, not approved policies or compliance commitments. Edit `client/src/config/legal.js` with reviewed business policies, privacy handling/retention and contact procedures, and confirmed cancellation/refund terms before launch. No jurisdiction, fees, retention period or refund timing is invented. Business/legal review should consult the official [MeitY data-protection framework](https://www.meity.gov.in/digital-personal-data-protection-act-2023) and [published rules](https://www.meity.gov.in/documents/act-and-policies/digital-personal-data-protection-rules-2025-gDOxUjMtQWa?pageTitle=Digital-Personal-Data-Protection-Rules-2025) for applicable requirements; these templates do not assert compliance.
+
+Seed photography remains development content and needs editorial approval. Some seeded place entries repeat the destination image, so destination detail renders those as text instead of duplicating a photograph for every place. Verify that each destination/experience photograph depicts the correct location before launch.
 
 Google Fonts load with `display=swap` and local fallbacks. The **frontend host's** CSP must account for styles from `https://fonts.googleapis.com`, fonts from `https://fonts.gstatic.com`, and current imagery from `https://images.unsplash.com`. Keep API `connect-src` same-origin. Framer Motion applies dynamic inline style attributes; configure the frontend style policy accordingly or replace/self-host assets and animations under a stricter policy. Express's API-only Helmet configuration does not automatically configure a separate static frontend host. No backend security settings were weakened.
 
-Newsletter submission includes explicit `consent: true`, as required by the existing backend. The shared enquiry dialog submits the established `type: enquiry` payload and does not create a booking. API errors are presented with safe user-facing messages.
+Newsletter submission includes explicit `consent: true`, as required by the existing backend. The shared enquiry dialog submits `type: enquiry`; experience preferences use a supported travel type and message, without fabricating a package relationship. The booking modal submits `type: booking` with package ID, a future UTC travel date, travelers and supported optional room preference/message. The booking contract does not accept a destination ID, so the package supplies that context. Contact uses `type: contact`, with optional phone and a message of at least ten characters. All submissions capture requests: there is no payment, inventory reservation or booking confirmation. API errors are presented with safe user-facing messages.
 
 ## Requirements and local setup
 

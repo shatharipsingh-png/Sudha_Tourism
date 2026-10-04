@@ -6,7 +6,7 @@ import { useDialog } from "../../hooks/useDialog";
 import { useEnquiry } from "../../context/EnquiryContext";
 import Button from "../common/Button";
 import styles from "./Layout.module.css";
-export default function Header() {
+export default function Header({ hasHero = false }) {
   const { pathname } = useLocation();
   const [scrolled, setScrolled] = useState(window.scrollY > 24);
   const [menu, setMenu] = useState(false);
@@ -20,7 +20,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
   useEffect(() => close(), [pathname, close]);
-  const clear = pathname === "/" && !scrolled;
+  const clear = (pathname === "/" || hasHero) && !scrolled;
   return (
     <>
       <header className={`${styles.header} ${clear ? styles.transparent : ""}`}>

@@ -103,6 +103,10 @@ h3 {
 main {
   min-height: 55vh;
 }
+/* The route/skip-link focus target is a content landmark, not a control. */
+main:focus {
+  outline: none;
+}
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

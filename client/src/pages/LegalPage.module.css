@@ -1,0 +1,114 @@
+.page {
+  max-width: 850px;
+  padding-block: 56px 80px;
+}
+.page > header {
+  margin-top: 44px;
+  margin-bottom: 32px;
+}
+.eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-accent-dark);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.page h1 {
+  font-size: clamp(2.6rem, 5vw, 4.5rem);
+  overflow-wrap: anywhere;
+  margin-bottom: 20px;
+}
+.intro {
+  font-size: 1.1rem;
+  color: var(--color-muted);
+}
+.notice {
+  border-left: 3px solid var(--color-accent-dark);
+  background: var(--color-cream);
+  padding: 22px 24px;
+  font-size: 0.85rem;
+  line-height: 1.85;
+}
+.notice p {
+  color: var(--color-muted);
+  margin: 8px 0 0;
+}
+.contents {
+  padding: 32px 0;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 40px;
+}
+.contents h2 {
+  font: 600 0.82rem var(--font-body);
+  margin-bottom: 18px;
+}
+.contents ol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px 30px;
+  padding-left: 20px;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.83rem;
+}
+.contents a:hover,
+.related a:hover {
+  color: var(--color-accent-dark);
+}
+.section {
+  scroll-margin-top: calc(var(--header-height) + 26px);
+  margin-bottom: 38px;
+}
+.section h2,
+.contact h2 {
+  font-size: 1.6rem;
+  margin-bottom: 18px;
+}
+.section p,
+.contact p {
+  font-size: 0.94rem;
+  line-height: 1.95;
+  color: var(--color-muted);
+}
+.contact {
+  padding-top: 30px;
+  border-top: 1px solid var(--color-border);
+}
+.contact a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  color: var(--color-accent-dark);
+}
+.related {
+  display: flex;
+  gap: 28px;
+  margin-top: 30px;
+  font-size: 0.82rem;
+}
+@media (max-width: 600px) {
+  .page h1 {
+    font-size: 2.3rem;
+  }
+  .page {
+    padding-block: 36px 56px;
+  }
+  .page > header {
+    margin-top: 32px;
+  }
+  .contents ol {
+    grid-template-columns: 1fr;
+  }
+  .section h2 {
+    font-size: 1.4rem;
+  }
+  .section p {
+    font-size: 0.89rem;
+  }
+  .notice {
+    padding: 20px;
+  }
+  .intro {
+    font-size: 1rem;
+  }
+}

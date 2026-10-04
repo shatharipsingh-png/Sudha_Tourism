@@ -17,6 +17,7 @@ export default function DestinationCard({ destination }) {
         <span className={styles.region}>{destination.region}</span>
         <h3>{destination.name}</h3>
         <p>{destination.short_desc}</p>
+        <span className={styles.destinationCta}>Explore Destination</span>
         <span className={styles.circle}>
           <ArrowUpRight size={19} aria-hidden="true" />
         </span>

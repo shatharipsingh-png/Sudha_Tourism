@@ -4,7 +4,14 @@ import { EnquiryProvider } from "./context/EnquiryContext";
 import Layout from "./components/layout/Layout";
 import { ErrorState } from "./components/common/States";
 const Home = lazy(() => import("./pages/Home"));
-const Placeholder = lazy(() => import("./pages/Placeholder"));
+const Destinations = lazy(() => import("./pages/Destinations"));
+const DestinationDetail = lazy(() => import("./pages/DestinationDetail"));
+const Packages = lazy(() => import("./pages/Packages"));
+const PackageDetail = lazy(() => import("./pages/PackageDetail"));
+const Experiences = lazy(() => import("./pages/Experiences"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const LegalPage = lazy(() => import("./pages/LegalPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 class RouteErrorBoundary extends Component {
   state = { failed: false };
@@ -32,19 +39,22 @@ export default function App() {
           <Routes>
             <Route element={<Layout />}>
               <Route index element={<Home />} />
-              {[
-                "destinations",
-                "destinations/:slug",
-                "packages",
-                "packages/:slug",
-                "experiences",
-                "about",
-                "contact",
-                "privacy",
-                "terms",
-                "cancellation",
-              ].map((path) => (
-                <Route key={path} path={path} element={<Placeholder />} />
+              <Route path="destinations" element={<Destinations />} />
+              <Route
+                path="destinations/:slug"
+                element={<DestinationDetail />}
+              />
+              <Route path="packages" element={<Packages />} />
+              <Route path="packages/:slug" element={<PackageDetail />} />
+              <Route path="experiences" element={<Experiences />} />
+              <Route path="about" element={<About />} />
+              <Route path="contact" element={<Contact />} />
+              {["privacy", "terms", "cancellation"].map((kind) => (
+                <Route
+                  key={kind}
+                  path={kind}
+                  element={<LegalPage kind={kind} />}
+                />
               ))}
               <Route path="*" element={<NotFound />} />
             </Route>

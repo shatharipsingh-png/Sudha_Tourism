@@ -1,0 +1,51 @@
+.cta {
+  background: var(--color-cream);
+  padding: 64px 0;
+}
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+.inner h2 {
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  margin-bottom: 16px;
+}
+.inner p:not(.eyebrow) {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  max-width: 520px;
+  margin-bottom: 0;
+}
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.68rem;
+  color: var(--color-accent-dark);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+@media (max-width: 1000px) {
+  .inner {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 26px;
+  }
+}
+@media (max-width: 600px) {
+  .cta {
+    padding: 48px 0;
+  }
+  .actions > a,
+  .actions > button {
+    font-size: 0.8rem;
+    padding-inline: 16px;
+  }
+}

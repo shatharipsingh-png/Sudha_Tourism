@@ -61,6 +61,14 @@
   border: 1px solid #c5c8bf;
   border-radius: 50%;
 }
+.destinationCta {
+  display: block;
+  font-size: 0.67rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-top: 15px;
+  padding-right: 34px;
+}
 .package {
   background: white;
   overflow: hidden;

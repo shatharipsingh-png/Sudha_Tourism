@@ -1,0 +1,337 @@
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.68rem;
+  color: var(--color-accent-dark);
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.story {
+  display: grid;
+  grid-template-columns: 1fr 1.45fr;
+  gap: 80px;
+  align-items: start;
+}
+.story h2 {
+  font-size: clamp(2.1rem, 3.5vw, 3.2rem);
+}
+.prose {
+  font-size: 1rem;
+  line-height: 1.95;
+  color: var(--color-muted);
+  white-space: pre-line;
+  max-width: 740px;
+}
+.soft {
+  background: var(--color-cream);
+}
+.reasonGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.reasonGrid li {
+  border-top: 1px solid #cfc6b8;
+  padding-top: 20px;
+}
+.reasonGrid span,
+.placeNumber {
+  color: var(--color-accent-dark);
+  font-size: 0.7rem;
+}
+.reasonGrid p {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  margin-top: 22px;
+}
+.places {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 36px;
+}
+.places article {
+  border-top: 1px solid var(--color-border);
+  padding-top: 20px;
+}
+.places h3 {
+  font-size: 1.4rem;
+  margin: 16px 0 14px;
+}
+.places p {
+  color: var(--color-muted);
+  font-size: 0.86rem;
+  line-height: 1.8;
+}
+.placeImage {
+  width: 100%;
+  aspect-ratio: 3/2;
+  object-fit: cover;
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+}
+.travelInfo {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 36px;
+}
+.travelInfo > div {
+  border-left: 2px solid #c9bba6;
+  padding-left: 24px;
+}
+.travelInfo h3 {
+  font-size: 1.35rem;
+  margin-bottom: 16px;
+}
+.travelInfo p,
+.travelInfo li {
+  font-size: 0.86rem;
+  color: var(--color-muted);
+  line-height: 1.9;
+}
+.travelInfo ul {
+  padding-left: 18px;
+  display: grid;
+  gap: 12px;
+}
+.heroMeta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: #f2eee6;
+}
+.heroMeta span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.heroBadge {
+  padding: 5px 10px;
+  border: 1px solid #fff8;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-size: 0.62rem;
+}
+.packageLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 72px;
+  align-items: start;
+}
+.packageSection {
+  padding: 0 0 44px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid var(--color-border);
+  scroll-margin-top: 120px;
+}
+.packageSection h2 {
+  font-size: 2rem;
+  margin-bottom: 24px;
+}
+.packageSection:last-child {
+  border-bottom: 0;
+  margin-bottom: 0;
+}
+.packageSection > p {
+  color: var(--color-muted);
+  line-height: 1.9;
+}
+.highlights {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.highlights li {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  color: var(--color-muted);
+  font-size: 0.88rem;
+  line-height: 1.8;
+}
+.highlights svg {
+  flex-shrink: 0;
+  color: var(--color-accent-dark);
+  margin-top: 4px;
+}
+.actionCard {
+  position: sticky;
+  top: calc(var(--header-height) + 28px);
+  padding: 30px;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 16px;
+}
+.actionCard .price {
+  font-size: 2.3rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.priceLabel {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  margin: 0;
+}
+.actionCard > p {
+  font-size: 0.77rem;
+  color: var(--color-muted);
+  line-height: 1.8;
+  margin-bottom: 0;
+}
+.actionCard hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  width: 100%;
+  margin: 8px 0;
+}
+.actionCard dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  font-size: 0.78rem;
+  margin: 0;
+}
+.actionCard dt {
+  color: var(--color-muted);
+}
+.actionCard dd {
+  margin: 0;
+  text-align: right;
+  text-transform: capitalize;
+}
+.inclusionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+.inclusionGrid h3 {
+  font-size: 1.35rem;
+}
+.checkList {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 14px;
+}
+.checkList li {
+  display: flex;
+  gap: 12px;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+.checkList svg {
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.included svg {
+  color: #3a6650;
+}
+.excluded svg {
+  color: #982b18;
+}
+.infoBlock {
+  padding: 24px;
+  background: var(--color-cream);
+  border-radius: 8px;
+}
+.infoBlock + .infoBlock {
+  margin-top: 18px;
+}
+.infoBlock h3 {
+  font-size: 1.2rem;
+}
+.infoBlock ul {
+  color: var(--color-muted);
+  font-size: 0.86rem;
+  line-height: 1.9;
+  padding-left: 20px;
+}
+.gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.gallery img,
+.gallery [role="img"] {
+  width: 100%;
+  aspect-ratio: 3/2;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+@media (max-width: 1100px) {
+  .packageLayout {
+    gap: 36px;
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+  .reasonGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .story {
+    gap: 48px;
+  }
+}
+@media (max-width: 800px) {
+  .story {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .story h2 br {
+    display: none;
+  }
+  .places {
+    grid-template-columns: 1fr 1fr;
+  }
+  .travelInfo {
+    grid-template-columns: 1fr;
+  }
+  .packageLayout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .actionCard {
+    position: static;
+    grid-row: 1;
+    max-width: 100%;
+  }
+  .actionCard .price {
+    font-size: 2rem;
+  }
+}
+@media (max-width: 540px) {
+  .places {
+    grid-template-columns: 1fr;
+  }
+  .highlights,
+  .inclusionGrid {
+    grid-template-columns: 1fr;
+  }
+  .packageSection h2 {
+    font-size: 1.7rem;
+  }
+  .packageSection {
+    padding-bottom: 30px;
+    margin-bottom: 30px;
+  }
+  .reasonGrid p {
+    font-size: 0.84rem;
+  }
+  .actionCard {
+    padding: 24px;
+  }
+  .gallery {
+    grid-template-columns: 1fr;
+  }
+  .story .prose {
+    font-size: 0.93rem;
+  }
+}

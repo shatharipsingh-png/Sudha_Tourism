@@ -8,7 +8,13 @@ export class ApiError extends Error {
 }
 export async function api(
   path,
-  { method = "GET", body, signal, credentials = "same-origin" } = {},
+  {
+    method = "GET",
+    body,
+    signal,
+    credentials = "same-origin",
+    safeMessages = {},
+  } = {},
 ) {
   if (!path.startsWith("/api/") || path.startsWith("//"))
     throw new Error("Use a relative API endpoint.");
@@ -36,8 +42,9 @@ export async function api(
     );
   }
   if (!response.ok || envelope.success !== true) {
-    const message =
-      response.status === 429
+    const message = Object.hasOwn(safeMessages, envelope.message)
+      ? safeMessages[envelope.message]
+      : response.status === 429
         ? "Please wait a few minutes before trying again."
         : response.status === 400
           ? "Please check the highlighted fields."

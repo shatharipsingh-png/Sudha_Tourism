@@ -1,5 +1,10 @@
-import { Component, lazy } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Component, lazy, Suspense } from "react";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Routes,
+  Route,
+} from "react-router-dom";
 import { EnquiryProvider } from "./context/EnquiryContext";
 import Layout from "./components/layout/Layout";
 import { ErrorState } from "./components/common/States";
@@ -13,6 +18,7 @@ const About = lazy(() => import("./pages/About"));
 const Contact = lazy(() => import("./pages/Contact"));
 const LegalPage = lazy(() => import("./pages/LegalPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Admin = lazy(() => import("./admin/Admin"));
 class RouteErrorBoundary extends Component {
   state = { failed: false };
   static getDerivedStateFromError() {
@@ -31,36 +37,50 @@ class RouteErrorBoundary extends Component {
     );
   }
 }
-export default function App() {
+function RootRoutes() {
   return (
     <RouteErrorBoundary>
-      <BrowserRouter>
-        <EnquiryProvider>
-          <Routes>
-            <Route element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="destinations" element={<Destinations />} />
+      <EnquiryProvider>
+        <Routes>
+          <Route
+            path="admin/*"
+            element={
+              <Suspense
+                fallback={
+                  <main className="section container" role="status">
+                    Loading admin…
+                  </main>
+                }
+              >
+                <Admin />
+              </Suspense>
+            }
+          />
+          <Route element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="destinations" element={<Destinations />} />
+            <Route path="destinations/:slug" element={<DestinationDetail />} />
+            <Route path="packages" element={<Packages />} />
+            <Route path="packages/:slug" element={<PackageDetail />} />
+            <Route path="experiences" element={<Experiences />} />
+            <Route path="about" element={<About />} />
+            <Route path="contact" element={<Contact />} />
+            {["privacy", "terms", "cancellation"].map((kind) => (
               <Route
-                path="destinations/:slug"
-                element={<DestinationDetail />}
+                key={kind}
+                path={kind}
+                element={<LegalPage kind={kind} />}
               />
-              <Route path="packages" element={<Packages />} />
-              <Route path="packages/:slug" element={<PackageDetail />} />
-              <Route path="experiences" element={<Experiences />} />
-              <Route path="about" element={<About />} />
-              <Route path="contact" element={<Contact />} />
-              {["privacy", "terms", "cancellation"].map((kind) => (
-                <Route
-                  key={kind}
-                  path={kind}
-                  element={<LegalPage kind={kind} />}
-                />
-              ))}
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
-        </EnquiryProvider>
-      </BrowserRouter>
+            ))}
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </EnquiryProvider>
     </RouteErrorBoundary>
   );
+}
+// A data router supplies the supported navigation blocker for unsaved CMS forms.
+const router = createBrowserRouter([{ path: "*", element: <RootRoutes /> }]);
+export default function App() {
+  return <RouterProvider router={router} />;
 }

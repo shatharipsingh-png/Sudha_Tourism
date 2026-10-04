@@ -192,6 +192,34 @@ Stats include totalLeads/newLeads/contactedLeads/closedLeads, leadsByType (all s
 
 Prices and Unsplash imagery are illustrative development content. An owner must verify prices, route availability and business copy, and replace temporary images with owned/licensed production imagery before launch. No verified reviews or guarantees are introduced. Known Phase 1 demo-price warnings are removed from public package responses without overwriting existing database content; new seed content does not contain them.
 
+## Phase 5 admin dashboard and CMS
+
+Open `/admin/login` in the running React application. Create your own administrator with the existing `server/` command `npm run admin:create`, supplying `ADMIN_EMAIL` and `ADMIN_PASSWORD` through the ignored environment file or a secure process environment. No permanent administrator or password is shipped by the frontend or verification tests.
+
+The separate lazy-loaded admin application includes the live dashboard, lead type/status filters and pagination, lead details and supported status transitions, and paginated destination/package/experience management. Create and edit forms provide labeled repeatable lists, top-place fields, travel information, gallery previews, itinerary days and activities, inclusions/exclusions, and experience examples. Move-up/down controls reorder lists; itinerary reordering also renumbers days. Prices use the established INR presentation. Optional ratings can remain blank.
+
+Packages start as **draft**. Only **published** packages appear in public APIs and pages; public pages fetch database content on subsequent navigation/reload. All deletions require a named confirmation. Content referenced by packages or historical leads cannot be deleted through the CMS. Lead status changes reload list/detail data; returning to the dashboard fetches fresh counts.
+
+Images use HTTP(S) URLs only, with previews and an unavailable-image fallback. There are no uploads. URL validation does not establish ownership or permanence: publish licensed/owned images. Arrays respect the backend's limits; large text/arrays must also fit the existing 20 KB request-body limit. Backend validation remains authoritative and returns field feedback. Form edits have a React Router navigation confirmation and a browser unload warning; browser unload dialogs are controlled by the browser.
+
+Authentication checks `/api/admin/me` and uses the existing HttpOnly, SameSite=Strict cookie; authenticated calls include credentials. No JWT or authentication state is stored in browser storage. Rejected sessions remove protected UI and redirect to sign-in, preserving the intended admin route. Logout clears the browser cookie. Deploy the frontend and API on the same site over HTTPS with the exact `CLIENT_URL`, retain backend origin checks, and provide SPA routing fallback for `/admin/*` and public routes. Admin pages set `noindex,nofollow`; this is indexing guidance, not authorization. Existing backend authorization and validation protect all admin endpoints.
+
+SMTP remains optional; the CMS does not send mail directly. Booking leads remain requests: there are no payments, inventory reservations or automatic booking confirmations. Business contact details, licensed imagery, actual pricing and legal text still require owner configuration/review before launch.
+
+Verification commands:
+
+```sh
+cd client
+npm test
+npm run build
+npm run test:admin
+npm run test:browser
+cd ../server
+npm test
+```
+
+`test:admin` uses mocked API responses and requires the Vite dev server. `test:browser` also requires the local seeded API and intercepts public form writes. Install Playwright Chromium (`npx playwright install chromium`) or set `CHROMIUM_PATH` to an existing executable; optional `CLIENT_URL` (`test:admin`) / `VERIFY_URL` (`test:browser`) selects the frontend origin. Neither committed browser test creates an administrator or writes MySQL. Phase 5 live verification used a generated temporary administrator through `admin:create`, isolated temporary records, real UI CRUD/session/status flows, and public published/draft reflection; the temporary administrator/content/lead were removed afterward. Real SMTP delivery and production hosting/TLS remain operator checks.
+
 ## Lead notifications
 
 SMTP is **disabled by default**. The API starts and captures leads normally without mail credentials, and startup reports enabled:false rather than pretending delivery. Enable only after configuring server/.env or a secret manager:

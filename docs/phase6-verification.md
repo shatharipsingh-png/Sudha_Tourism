@@ -1,0 +1,57 @@
+# Phase 6 verification
+
+Verified locally on 2026-10-04 using Node 24.14.0, Chromium and MySQL Community Server **8.4.11**, database **sudha_tourism**. This records development verification, not a production deployment or launch approval. The ignored server environment was not edited or printed. SMTP was explicitly disabled in verification processes.
+
+## Results
+
+| Check                     | Result                                   | Scope                                                                                                                                                                             |
+| ------------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend unit tests       | **70/70 PASS**                           | Existing 49 retained; configuration safety, SEO/JSON-LD, CSP/robots and redacted secret scan added                                                                                |
+| Backend tests             | **99/99 PASS**                           | Existing 85 retained; sitemap, production config/admin seeding, Origin/CORS, private headers/request IDs added                                                                    |
+| Public browser regression | **27/27 PASS**                           | Real local GET APIs, intercepted form POSTs; 12 routes at 375/768/1024/1440px                                                                                                     |
+| Admin browser regression  | **21/21 PASS**                           | Mocked API; auth, expiry, CRUD payloads/conflicts, status, focus, mobile and metadata cleanup                                                                                     |
+| Production browser groups | **10/10 PASS**                           | Configured production build under local preview, mocked API/images/fonts; canonical/detail metadata, safe errors, strict frontend CSP, no application errors                      |
+| Automated accessibility   | **29 reviewed states, zero violations**  | axe-core 4.13.0 WCAG 2 A/AA, 2.1 AA and best-practice checks; includes public pages, missing pages, admin forms, lead/menu/booking dialogs                                        |
+| Frontend build            | **PASS**                                 | Both unconfigured safe default and synthetic configured HTTPS-origin build; no failure warnings                                                                                   |
+| npm security audits       | **0 vulnerabilities: client and server** | Full `npm audit`; no forced upgrades, no dependency/lockfile changes                                                                                                              |
+| Database/migrations       | **PASS**                                 | Actual MySQL 8.4.11, expected database; two documented migration runs, same names/checksums/timestamps afterward                                                                  |
+| Production-mode API       | **PASS locally**                         | `NODE_ENV=production`, random process-only secrets, synthetic reserved HTTPS frontend origin, actual local MySQL                                                                  |
+| Health/readiness          | **PASS**                                 | Health 200, real DB readiness 200; separate process with nonexistent local DB user gives health 200 and generic readiness 503                                                     |
+| Pagination                | **PASS**                                 | Actual default/page 1/filtered package queries, invalid page 400, authenticated admin lead page/limit; no mysql2 LIMIT/OFFSET error                                               |
+| Dynamic sitemap           | **PASS**                                 | Actual database slugs; temporary draft excluded from list/detail/XML, publishing makes detail/XML visible; no admin/API URLs                                                      |
+| Live admin/CMS E2E        | **PASS**                                 | Intentional temporary `admin:create`, browser cookie login/me/stats, destination/package/experience create/edit/delete, real lead detail/status, referenced-delete 409 and logout |
+| Four public forms         | **PASS**                                 | Browser enquiry, booking request, contact and newsletter persisted; empty honeypots, newsletter consent, duplicate newsletter no duplicate row, sixth lead request 429            |
+| Data preservation         | **PASS**                                 | Only uniquely identified temporary development rows removed; original destination/package/experience/lead/admin IDs preserved after live runs                                     |
+| Graceful shutdown         | **PASS locally**                         | Production HTTP/pool close and exit 0 via Node SIGTERM handler; unavailable-DB process closes too; Windows native/supervisor delivery still requires deployment verification      |
+| Current secret scan       | **PASS, redacted**                       | Tracked and Git-visible source: no actionable current credentials, fixture values classified separately                                                                           |
+| Historical scan           | **ACTION REQUIRED if ever used**         | Seven available commits inspected for env files; credential-looking `DB_PASSWORD` in five versions of `server/.env.example`; removed now but remains in history                   |
+
+## Fixes and review evidence
+
+Admin primary buttons and empty image-preview text had insufficient contrast; darker text/button colors resolved the automated findings. Package filter updates could lose an edit before router navigation settled; the latest query reference preserves consecutive changes. Browser tests now wait for asynchronous destination choices and the exact filtered lead response rather than asserting against earlier rendered/request state. Existing coverage counts did not decrease.
+
+The frontend CSP stayed restrictive. axe's optional cross-origin stylesheet preload was disabled in the test harness because it issues an extra XHR forbidden by `connect-src`; application CSS is same-origin and external font CSS is an empty isolated fixture. The actual app policy was not relaxed to accommodate audit tooling. The configured build produced no application CSP violations across reviewed navigations. This is not a certification or real-font typography audit.
+
+Production login returned HttpOnly, Secure, SameSite=Strict, Path=/, eight-hour cookie flags. Local production-mode API tests manually supplied the cookie over HTTP to verify the server contract; this does **not** demonstrate a real browser Secure cookie over TLS. Browser cookie flows were independently verified in development. Exact-origin CORS, approved-Origin cookie-bearing writes, server-side authorization and safe body/error/limiter behavior pass tests. Proxy correctness and distributed limits remain deployment responsibilities.
+
+Migration implementation remains unchanged: deterministic order, advisory lock, checksum verification and recording only after successful statements. Existing failure/retry tests pass; live runs were no-ops against the already initialized database. No new migration, manual schema modification, destructive seed or automatic reset was used. Non-destructive seed preservation/rollback remains covered by the backend suite; Phase 6 did not reload illustrative catalog into the real DB.
+
+SMTP absent/disabled, transport rejection after lead storage and newsletter exclusion are covered by existing backend tests. Live tests stored leads with notifications disabled. No real email was sent and delivery is unverified.
+
+Both lockfiles are present and unchanged. React, React DOM, router and Motion resolve to deduplicated copies. Approximate configured-build JS sizes: main **239 kB / 75 kB gzip**, shared site/Motion **109 / 37**, Home **132 / 43**, lazy admin **41 / 12**. Public initial navigation did not load the admin chunk. Public heroes are eager/high-priority; shared below-fold images are lazy, have useful alt/failure states and reserve layout through CSS sizing/aspect ratios. Seed image URLs still request up to 1600px: replacement assets need responsive sizing and real network/LCP measurement before performance sign-off.
+
+The read-only [content audit](content-audit.md) inventories **5 destinations, 7 packages, 6 experiences and 62 image usages** from the real local catalog/shared sections. All temporary images, business facts and prices require owner review; no third-party images were downloaded or ownership asserted. Pricing presentation is centralized as an explicitly unapproved INR/per-person assumption. Request copy does not claim payment, availability or confirmed reservation. Contact/social placeholders remain omitted. Legal templates make no supplied jurisdiction, refund-percentage, registration or compliance guarantees.
+
+Rotate the historical example DB password if ever used, including reuse elsewhere. Current replacement does not remove past exposure. No history rewrite or automatic account rotation occurred.
+
+## Reproduction and limits
+
+Run `npm test` in each active package. With the local API/Vite running, run frontend `npm run test:browser` and `npm run test:admin`. `npm run test:production` is a fully mocked, non-writing suite. Supply `CHROMIUM_PATH` if needed and `AXE_SOURCE` for the optional axe audit. For a configured production preview set matching build/preview public configuration, `VERIFY_URL`, `SEO_SITE_URL`, `EXPECT_CSP=true`; use a reserved synthetic domain only in verification, never a release. Build again with real approved configuration for deployment. The final local default build emits no invented sitemap/canonical origin. Live writing checks used guarded temporary local harnesses, generated credentials and identity-specific cleanup, not production fixtures or permanent admins.
+
+**UNVERIFIED:** actual production domain/DNS/HTTPS, real-browser Secure/Strict cookies across final origin topology, selected proxy IP handling, provider MySQL/TLS and least privilege, production supervisor signals, actual backup/restore, real SMTP delivery, Firefox, Safari, NVDA/VoiceOver, real-font/approved-image accessibility, real network/Lighthouse/Core Web Vitals, social/search crawler previews and production SPA 404 behavior. Node 20/22 compatibility is retained by engines/code but not executed locally; local verification used Node 24.
+
+Client metadata is updated after JavaScript runs. Crawlers that do not execute JavaScript may see the base HTML title/description and miss dynamic social images/entities. Static SPA fallback may return HTTP 200 for unknown routes. Resolve or explicitly assess these limits on real URLs before SEO approval; this phase introduces no SSR framework.
+
+## Disposition
+
+**CODE READY** for the documented deployment-preparation scope. **CONTENT NOT READY; LEGAL NOT READY; SEO NOT READY; DEPLOYMENT NOT READY; PRODUCTION NOT READY.** Complete the [launch checklist](launch-checklist.md) with approved business details, images/prices, policies, domain/configuration and actual deployment checks. No production deployment was performed.

@@ -1,3 +1,4 @@
+import { resolveApiPath } from "../config/deployment.js";
 export class ApiError extends Error {
   constructor(message, status = 0, fields = {}) {
     super(message);
@@ -16,11 +17,10 @@ export async function api(
     safeMessages = {},
   } = {},
 ) {
-  if (!path.startsWith("/api/") || path.startsWith("//"))
-    throw new Error("Use a relative API endpoint.");
+  const requestPath = resolveApiPath(path);
   let response;
   try {
-    response = await fetch(path, {
+    response = await fetch(requestPath, {
       method,
       signal,
       credentials,

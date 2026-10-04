@@ -271,13 +271,22 @@ try {
       await heading("Leads");
       await page.getByLabel("Types", { exact: true }).selectOption("enquiry");
       await page.waitForURL("**/admin/leads?type=enquiry");
+      const filtered = page.waitForResponse((response) => {
+        const url = new URL(response.url());
+        return (
+          url.pathname === "/api/admin/leads" &&
+          url.searchParams.get("status") === "new"
+        );
+      });
       await page.getByLabel("Statuses", { exact: true }).selectOption("new");
+      await filtered;
       await page
         .getByRole("button", { name: "View lead Test Traveler" })
         .waitFor();
       assert.ok(page.url().includes("type=enquiry"));
       assert.equal(leadFilters.at(-1).status, "new");
       await page.getByRole("button", { name: "Clear filters" }).click();
+      await page.waitForURL("**/admin/leads");
       assert.equal(new URL(page.url()).search, "");
     },
   );

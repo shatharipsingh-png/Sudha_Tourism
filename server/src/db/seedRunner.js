@@ -3,6 +3,7 @@ import { destinationData, packageData, experienceData } from './seed-data.js';
 import { assertMySQL8 } from './version.js';
 
 export async function seedDatabase(connection, admin) {
+  if (process.env.NODE_ENV === 'production' && admin) throw new Error('Provision production administrators with admin:create, not seed.');
   await assertMySQL8(connection);
   const [migrations] = await connection.execute('SELECT name FROM schema_migrations WHERE name = ?', ['002_newsletter_consent.sql']);
   if (!migrations.length) throw new Error('Run migrations before seeding.');

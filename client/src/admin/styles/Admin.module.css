@@ -53,12 +53,12 @@
   cursor: default;
 }
 .admin .primary {
-  background: #d9622b;
+  background: #ac4218;
   color: white;
-  border-color: #d9622b;
+  border-color: #ac4218;
 }
 .admin .primary:hover {
-  background: #bd4e1e;
+  background: #92380f;
 }
 .admin .danger {
   background: #a62424;
@@ -421,7 +421,7 @@
   border-radius: 7px;
   display: grid;
   place-items: center;
-  color: #786b5d;
+  color: #65584b;
   font-size: 0.7rem;
 }
 .preview :global(img) {

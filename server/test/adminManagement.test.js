@@ -12,7 +12,7 @@ import {publicPackageInfo} from '../src/utils/publicContent.js';
 let db;
 const cookie=`st_admin=${jwt.sign({sub:'1'},env.JWT_SECRET,{algorithm:'HS256'})}`;
 const api=(method,path,body)=> {
-  const result=request(app)[method](path).set('Cookie',cookie);
+  const result=request(app)[method](path).set('Origin',env.CLIENT_URL).set('Cookie',cookie);
   return body===undefined?result:result.send(body);
 };
 beforeEach(()=>{
@@ -28,7 +28,7 @@ test('successful login, admin/me and logout share cookie contract',async()=>{
   const me=await request(app).get('/api/admin/me').set('Cookie',token);
   assert.equal(me.status,200);
   assert.equal(me.body.data.id,1);
-  const logout=await request(app).post('/api/admin/logout').set('Cookie',token);
+  const logout=await request(app).post('/api/admin/logout').set('Origin',env.CLIENT_URL).set('Cookie',token);
   assert.equal(logout.status,200);
   assert.match(logout.headers['set-cookie'][0],/st_admin=;/);
   assert.equal((await request(app).get('/api/admin/me')).status,401);

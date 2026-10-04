@@ -12,7 +12,7 @@ let db;
 let ip=1;
 const cookie=`st_admin=${jwt.sign({sub:'1'},env.JWT_SECRET,{algorithm:'HS256'})}`;
 function api(method,path,body) {
-  const result=request(app)[method](path).set('Cookie',cookie).set('X-Forwarded-For',`203.0.113.${ip++}`);
+  const result=request(app)[method](path).set('Origin',env.CLIENT_URL).set('Cookie',cookie).set('X-Forwarded-For',`203.0.113.${ip++}`);
   return body === undefined ? result : result.send(body);
 }
 beforeEach(()=>{

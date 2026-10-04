@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "test": "node --test test/*.test.js",
     "test:browser": "node test/browser-smoke.mjs",
-    "test:admin": "node test/admin-browser.mjs"
+    "test:admin": "node test/admin-browser.mjs",
+    "test:production": "node test/production-browser.mjs"
   },
   "dependencies": {
     "react": "^19.2.0",

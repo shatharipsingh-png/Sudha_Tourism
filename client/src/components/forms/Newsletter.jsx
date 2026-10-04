@@ -6,6 +6,7 @@ import styles from "./Forms.module.css";
 export default function Newsletter() {
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
+  const [website, setWebsite] = useState("");
   const [state, setState] = useState({
     loading: false,
     message: "",
@@ -22,7 +23,12 @@ export default function Newsletter() {
     setState({ loading: true, message: "", error: false });
     try {
       await submitLead(
-        { type: "newsletter", email: email.trim(), consent },
+        {
+          type: "newsletter",
+          email: email.trim(),
+          consent,
+          website: website || undefined,
+        },
         controller.current.signal,
       );
       setEmail("");
@@ -41,6 +47,17 @@ export default function Newsletter() {
   }
   return (
     <form onSubmit={submit} className={styles.newsletter}>
+      <div hidden aria-hidden="true">
+        <label htmlFor="newsletter-website">Website</label>
+        <input
+          id="newsletter-website"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          value={website}
+          onChange={(event) => setWebsite(event.target.value)}
+        />
+      </div>
       <label htmlFor="newsletter-email" className="sr-only">
         Newsletter email address
       </label>

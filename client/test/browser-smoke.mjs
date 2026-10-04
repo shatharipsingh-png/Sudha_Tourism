@@ -81,6 +81,9 @@ try {
     .nth(1)
     .click();
   await page.locator("#enquiry-destination").waitFor({ state: "visible" });
+  await page.waitForFunction(
+    () => !document.getElementById("enquiry-destination").disabled,
+  );
   assert.equal(
     await page.locator("#enquiry-destination").inputValue(),
     String(d.id),
@@ -154,6 +157,9 @@ try {
   });
   await enquiry.click();
   await page.locator("#enquiry-name").waitFor({ state: "visible" });
+  await page.waitForFunction(
+    () => !document.getElementById("enquiry-destination").disabled,
+  );
   assert.equal(
     await page.locator("#enquiry-destination").inputValue(),
     String(p.destination_id),
@@ -173,9 +179,14 @@ try {
     await page.evaluate(() => document.body.style.overflow),
     "hidden",
   );
-  for (const width of [375,768,1024,1440]) {
-    await page.setViewportSize({width,height:1000});
-    assert.ok(await page.locator('dialog[open]').evaluate(dialog=>dialog.scrollWidth<=dialog.clientWidth),`Booking modal overflow at ${width}px`);
+  for (const width of [375, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    assert.ok(
+      await page
+        .locator("dialog[open]")
+        .evaluate((dialog) => dialog.scrollWidth <= dialog.clientWidth),
+      `Booking modal overflow at ${width}px`,
+    );
   }
   await trap("dialog[open]");
   await page.keyboard.press("Escape");
@@ -195,7 +206,9 @@ try {
     name: "Browser Test",
     email: "smoke@example.invalid",
     phone: "+919876543210",
-    travel_date: new Date(Date.now()+30*86400000).toISOString().slice(0,10),
+    travel_date: new Date(Date.now() + 30 * 86400000)
+      .toISOString()
+      .slice(0, 10),
     travelers: "2",
   }))
     await page.locator("#booking-" + key).fill(value);

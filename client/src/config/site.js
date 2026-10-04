@@ -1,3 +1,4 @@
+import { publicConfig } from "./deployment.js";
 export const PLACEHOLDER = "PLACEHOLDER";
 export const isConfigured = (value) =>
   typeof value === "string" && value.trim() && value !== PLACEHOLDER;
@@ -20,7 +21,8 @@ export const site = {
     travelerCount: PLACEHOLDER,
     destinationsCovered: PLACEHOLDER,
   },
-  canonicalOrigin: PLACEHOLDER,
+  canonicalOrigin: publicConfig.siteUrl,
+  socialImage: publicConfig.socialImage,
   description:
     "Explore North India with Sudha Tourism. Find inspiration for your next journey through its landscapes, cities and cultures.",
   heroImage:

@@ -6,6 +6,7 @@ export default function NotFound() {
   useSeo(
     "Page not found",
     "This trail seems to lead somewhere else. Explore North India with Sudha Tourism.",
+    { robots: "noindex,nofollow" },
   );
   return (
     <section className={`container ${styles.page}`}>

@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { pricing } from "../config/pricing";
 import { useParams, Link } from "react-router-dom";
 import { Clock3, MapPin, Star, Check, X, ArrowRight } from "lucide-react";
 import { getPackage } from "../api/api";
@@ -26,6 +27,18 @@ export default function PackageDetail() {
       ? "Page not found"
       : pkg?.title || "Tour Package",
     pkg?.short_desc || "Explore North India tour packages with Sudha Tourism.",
+    {
+      image: pkg?.image,
+      robots: resource.error ? "noindex,nofollow" : undefined,
+      trip: pkg,
+      breadcrumbs: pkg
+        ? [
+            { label: "Home", path: "/" },
+            { label: "Packages", path: "/packages" },
+            { label: pkg.title, path: `/packages/${pkg.slug}` },
+          ]
+        : undefined,
+    },
   );
   const { openEnquiry } = useEnquiry();
   const [booking, setBooking] = useState(false);
@@ -184,7 +197,9 @@ export default function PackageDetail() {
             {priceAvailable ? formatPrice(pkg.price) : "Contact for pricing"}
           </strong>
           {priceAvailable && (
-            <p className={styles.priceLabel}>per person · INR</p>
+            <p className={styles.priceLabel}>
+              {pricing.unit} · {pricing.currency}
+            </p>
           )}
           <hr />
           <dl>

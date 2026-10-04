@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { pricing } from "../../config/pricing";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getDestinations } from "../../api/api";
 import { categories } from "../../config/site";
@@ -334,13 +335,17 @@ function Editor({ kind, record }) {
                       max: 365,
                       step: 1,
                     })}
-                    {field("price", "Price (₹ INR)", {
-                      type: "number",
-                      required: true,
-                      min: 0,
-                      max: 4294967295,
-                      step: 1,
-                    })}
+                    {field(
+                      "price",
+                      `Price (${pricing.symbol} ${pricing.currency})`,
+                      {
+                        type: "number",
+                        required: true,
+                        min: 0,
+                        max: 4294967295,
+                        step: 1,
+                      },
+                    )}
                   </div>
                   {field("rating", "Rating (optional)", {
                     type: "number",

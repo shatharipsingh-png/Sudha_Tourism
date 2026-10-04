@@ -16,6 +16,6 @@ export function errorHandler(err, req, res, next) {
   if (err.expose === true && [400,404,409].includes(err.status)) return fail(res, err.status, err.message);
   const messages = { 400: 'Invalid request.', 401: 'Unauthorized.', 403: 'Forbidden.', 404: 'Resource not found.', 413: 'Request body too large.', 429: 'Too many requests.' };
   if (err.expose === true && messages[err.status]) return fail(res, err.status, messages[err.status]);
-  console.error(JSON.stringify({ event: 'request_error', status: 500 }));
+  console.error(JSON.stringify({ event: 'request_error', requestId:req.requestId, status: 500 }));
   return fail(res, 500, 'Something went wrong.');
 }

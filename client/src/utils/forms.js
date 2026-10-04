@@ -1,3 +1,4 @@
+import { pricing } from "../config/pricing.js";
 const optionalNumber = (value) =>
   value === "" || value == null ? undefined : Number(value);
 export function tomorrowUtc(now = new Date()) {
@@ -106,9 +107,9 @@ export function formatPrice(value) {
     !Number.isFinite(Number(value))
   )
     return "Price on enquiry";
-  return new Intl.NumberFormat("en-IN", {
+  return new Intl.NumberFormat(pricing.locale, {
     style: "currency",
-    currency: "INR",
+    currency: pricing.currency,
     maximumFractionDigits: 0,
   }).format(Number(value));
 }

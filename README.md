@@ -1,8 +1,20 @@
 # Sudha Tourism
 
 Current: **server/ = Node + Express 4 + JavaScript + mysql2/promise + MySQL 8+**.
-Public frontend: **client/ = React + Vite + JavaScript + CSS Modules**. All public routes are implemented through Phase 4; backend contracts remain unchanged.
+Public frontend: **client/ = React + Vite + JavaScript + CSS Modules**. Public routes and admin CMS are complete through Phase 5; Phase 6 adds production preparation within the existing architecture.
 Reusable draft copy and UI ideas are preserved in [project notes](docs/preserved-project-notes.md); these include unverified placeholders, not approved business facts.
+
+## Production preparation (Phase 6)
+
+Read [deployment and recovery](docs/deployment.md), the [owner launch checklist](docs/launch-checklist.md), [actual catalog/image audit](docs/content-audit.md), and [verification results](docs/phase6-verification.md). No production deployment has been performed. Business details, imagery, prices and legal policies require approval before launch.
+
+Copy `client/.env.example` when configuring a deployment. Its four permitted `VITE_*` fields are public only; unapproved fields fail configuration without printing their values. Set `VITE_SITE_URL` to the approved HTTPS frontend origin, matching backend `CLIENT_URL`. Set `VITE_API_ORIGIN` only for an intentional separate same-site API origin. Choose an approved `VITE_SOCIAL_IMAGE` and explicit `VITE_IMAGE_ORIGINS`. Unconfigured site origin omits canonical URLs; `/sitemap.xml` returns safe 503 rather than publishing local URLs. The build emits robots and a frontend header manifest; the actual frontend host must apply the headers and proxy sitemap requests to Express.
+
+Use locked `npm ci` installations for deployment. `.nvmrc` suggests Node 22; existing engines retain Node 20 compatibility (frontend 20.19+ or 22.12+). Review maintained runtime releases before launch. Production admins must be provisioned with `npm run admin:create`; seed rejects admin provisioning in production. Cookie-bearing admin writes require the exact configured frontend Origin.
+
+Run `node scripts/check-secrets.mjs` for a redacted current Git-visible scan and add `--history` to inspect available history. A credential-looking `DB_PASSWORD` was removed from tracked `server/.env.example`; it remains in earlier Git commits. Rotate it if ever used, and check for reuse. No history was rewritten and private `.env` files were not changed.
+
+Run `node scripts/audit-content.mjs --live --output docs/content-audit.md` to refresh the public catalog audit against the guarded local development database. The default command audits seed data without connecting. `npm run test:production` from `client/` exercises mocked SEO, metadata transitions, safe failures and admin/public states. For the optional automated accessibility pass, set `AXE_SOURCE` to a locally supplied axe-core source file; it does not install a runtime dependency. Set `VERIFY_URL`, `SEO_SITE_URL` and `EXPECT_CSP=true` when checking a configured production build under local preview. Preview is verification tooling, not a production hosting command.
 
 ## Public frontend (Phase 4)
 
@@ -34,7 +46,7 @@ npm run preview
 
 Production should serve `client/dist` with SPA fallback to `index.html` for frontend routes, and reverse-proxy `/api` to Express on the same public origin. The Vite development proxy is not part of the production build. Do not route `/api` errors to the SPA fallback. Use HTTPS and set the backend's `CLIENT_URL` to the real public origin.
 
-Update **client/src/config/site.js** with approved phone, email, address, hours, WhatsApp, social URLs, stats and `canonicalOrigin`. Unknown values are explicitly `PLACEHOLDER`; unconfigured contact links, stats and WhatsApp are hidden. Canonical tags are omitted until a real origin is supplied. Replace development Unsplash images with approved imagery before launch, and review seeded package prices/content. No logo, ratings, testimonials or business statistics have been invented.
+Update **client/src/config/site.js** with approved phone, email, address, hours, WhatsApp, social URLs and any supported stats. Set canonical origin through `VITE_SITE_URL`. Unknown values are explicitly `PLACEHOLDER`; unconfigured contact links, stats and WhatsApp are hidden. Canonical tags are omitted until a real origin is supplied. Replace development Unsplash images with approved imagery before launch, and review seeded package prices/content. No logo, ratings, testimonials or business statistics have been invented.
 
 Home, destination/package lists and details, Experiences, About, Contact, Privacy, Terms, Cancellation and 404 are implemented. Catalog content comes from the existing public APIs. The packages URL is the filter source of truth; filtering resets `page`, pagination preserves active filters, and Back/Forward restores selections. Duration values are `short` (1–4 days), `medium` (5–7 days) and `long` (8+ days). The list requests six packages per page by default; a valid URL `limit` may specify 1–24. Pagination is performed by MySQL through the API.
 
@@ -62,9 +74,11 @@ cp .env.example .env
 Edit the ignored server/.env privately. Set DB_HOST, DB_PORT (3306), DB_USER, DB_PASSWORD, DB_NAME (sudha_tourism).
 Set CLIENT_URL to an exact browser origin (development http://localhost:5173; no trailing slash).
 PORT defaults to 5000. Generate two separate random secrets:
+
 ```sh
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
+
 Use one for JWT_SECRET (32+ characters), another for IP_SALT (16+). Never commit credentials. ADMIN_EMAIL/ADMIN_PASSWORD are seed-only and are not required to start the API.
 
 ## Initialization, migrations and seed
@@ -72,38 +86,48 @@ Use one for JWT_SECRET (32+ characters), another for IP_SALT (16+). Never commit
 **Initialization != migration != seed.**
 
 Initialization creates the database only:
+
 ```sh
 npm run db:init
 ```
+
 This needs database-creation privileges. Alternatively an operator can execute:
+
 ```sql
 CREATE DATABASE IF NOT EXISTS sudha_tourism CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
-Use separate restricted runtime/migration accounts in production. Runtime needs SELECT/INSERT/UPDATE on application tables; migration accounts need appropriate DDL and schema_migrations access.
+
+Use separate restricted runtime/migration accounts in production. Runtime needs SELECT/INSERT/UPDATE/DELETE on application tables for the CMS; migration accounts need appropriate DDL and schema_migrations access.
 
 Migrations create/extend schema:
+
 ```sh
 npm run migrate
 npm run migrate
 ```
+
 Files in server/src/db/migrations execute sequentially under a MySQL advisory lock. Successful files/checksums are stored in schema_migrations; failed files are not marked successful. Repeated successful runs are safe. Changed/missing applied files or out-of-order additions fail. Migration 001 adopts the original five-table schema with CREATE TABLE IF NOT EXISTS, preserving records. Existing tables must match that original schema.
 SQL files use -- statement-breakpoint between statements. The runner accepts additive CREATE TABLE/ALTER TABLE and rejects obvious destructive operations. Review future migrations and back up production.
 [MySQL DDL implicitly commits](https://dev.mysql.com/doc/refman/8.4/en/implicit-commit.html); multi-statement DDL cannot be transactionally rolled back. Initial creation is retryable; 002 is one atomic ALTER. If a connection/process fails after DDL but before tracking, inspect schema and ledger before retrying; do not recover by dropping tables.
 
 Seed inserts missing catalog/admin records:
+
 ```sh
 npm run seed
 npm run seed
 ```
+
 **Seed is non-destructive**: no table creation/deletion, no lead deletion, no duplicate catalog records, no overwriting owner edits or existing admin passwords. It requires migrations first and uses a transaction.
-With neither ADMIN_EMAIL nor ADMIN_PASSWORD, seed is catalog-only. To create an admin supply both; password 12+ characters and <=72 UTF-8 bytes. A partial pair fails. Remove seed credentials after use. Existing catalog prices are demo data; verify before launch.
+With neither ADMIN_EMAIL nor ADMIN_PASSWORD, seed is catalog-only. Development-only seed admin provisioning accepts both; password 12+ characters and <=72 UTF-8 bytes. A partial pair fails. Production seed rejects admin credentials: use `npm run admin:create` intentionally. Remove provisioning credentials after use. Existing catalog prices are demo data; verify before launch.
 
 Migration 002 adds consent_at, unsubscribed_at and a generated normalized newsletter_email unique key. Legacy duplicate emails cause an atomic failure, preserving all records. Find duplicates privately:
+
 ```sql
 SELECT LOWER(TRIM(email)) AS normalized_email, COUNT(*) AS count
 FROM leads WHERE type = 'newsletter'
 GROUP BY LOWER(TRIM(email)) HAVING COUNT(*) > 1;
 ```
+
 Back up and manually review/archive/reconcile duplicates with an explicit retention decision, then retry. No automatic deletion or invented historical consent occurs. Existing consent timestamps remain NULL. This is minimal consent infrastructure, not legal compliance.
 
 ## Development and tests
@@ -113,6 +137,7 @@ npm run dev
 npm start
 npm test
 ```
+
 Development uses Node watch mode; production uses start.
 Tests preload isolated values, skip .env and prohibit real pool query/connection access. In-memory replacements cover HTTP validation/auth/errors, pagination, proxy rate limits, readiness, migration tracking and seed safety. No production credentials or DB writes are needed; these do not replace MySQL integration tests.
 With a configured development database, run migrate twice and seed twice; compare lead/catalog counts, start the API and check liveness/readiness. Do not verify against production. Checks without credentials remain UNVERIFIED.
@@ -121,28 +146,29 @@ With a configured development database, run migrate twice and seed twice; compar
 
 All responses use { success, data, message }; validation errors have data.errors.
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| GET | /api/health | Lightweight liveness, no DB query |
-| GET | /api/health/ready | SELECT 1; ready/connected or generic 503 |
-| GET | /api/destinations | Destination list |
-| GET | /api/destinations/:slug | Destination and published packages |
-| GET | /api/packages | Filtered/paginated published packages |
-| GET | /api/packages/:slug | Detail and related packages |
-| GET | /api/experiences | Experiences |
-| POST | /api/leads | Unified enquiry/booking/contact/newsletter |
-| POST | /api/admin/login | Sign-in |
-| POST | /api/admin/logout | Authenticated cookie clearing |
-| GET | /api/admin/me | Authenticated administrator |
-| GET | /api/admin/leads | Authenticated paginated lead list |
-| GET | /api/admin/stats | newLeadsByType, publishedPackages, totalDestinations |
-| PATCH | /api/admin/leads/:id | Authenticated status update |
+| Method | Path                    | Purpose                                              |
+| ------ | ----------------------- | ---------------------------------------------------- |
+| GET    | /api/health             | Lightweight liveness, no DB query                    |
+| GET    | /api/health/ready       | SELECT 1; ready/connected or generic 503             |
+| GET    | /api/destinations       | Destination list                                     |
+| GET    | /api/destinations/:slug | Destination and published packages                   |
+| GET    | /api/packages           | Filtered/paginated published packages                |
+| GET    | /api/packages/:slug     | Detail and related packages                          |
+| GET    | /api/experiences        | Experiences                                          |
+| POST   | /api/leads              | Unified enquiry/booking/contact/newsletter           |
+| POST   | /api/admin/login        | Sign-in                                              |
+| POST   | /api/admin/logout       | Authenticated cookie clearing                        |
+| GET    | /api/admin/me           | Authenticated administrator                          |
+| GET    | /api/admin/leads        | Authenticated paginated lead list                    |
+| GET    | /api/admin/stats        | newLeadsByType, publishedPackages, totalDestinations |
+| PATCH  | /api/admin/leads/:id    | Authenticated status update                          |
 
 Package filters: destination slug; category family/adventure/honeymoon/spiritual/cultural/wildlife/luxury; duration short (<=4), medium (5–7), long (>=8); minPrice/maxPrice; best_seller/featured true/false; page 1–100000; limit 1–24, default 12.
 Admin leads: type; status new/contacted/closed; page 1–100000; limit 1–50, default 20.
 Pagination passes bounded integers through mysql2 query() text protocol, avoiding prepared LIMIT binding issues; other SQL uses execute(). [mysql2 documentation](https://sidorares.github.io/node-mysql2/docs/documentation)
 
 Lead input:
+
 - enquiry: name/email/phone; optional package_id, destination_id, travel_date, travelers (1–50), message; details allows duration, budget, travel_type.
 - booking: name/email/phone, published package_id, future YYYY-MM-DD date and travelers required; details allows room_preference single/double/triple/family. Dates use UTC calendar days; today is rejected.
 - contact: name/email, message 10–2000 characters; optional phone.
@@ -167,13 +193,16 @@ The pool assumes local/private trusted MySQL networking; remote database TLS is 
 ## Phase 2 admin backend
 
 Create an administrator without running the catalog seed:
+
 ```sh
 cd server
 npm run admin:create
 ```
+
 Supply ADMIN_EMAIL and ADMIN_PASSWORD through the ignored server/.env or a secure process environment. Email is normalized. Password must have 12+ characters, uppercase, lowercase, a number and a symbol, and be <=72 UTF-8 bytes. Only a bcrypt cost-12 hash is stored. Existing emails fail safely; passwords are never silently reset. API startup does not require these variables. Remove seed/creation credentials from the deployment environment after use. Rotate any real credential previously placed in .env.example or committed to source control.
 
 Authenticated content endpoints for each of destinations/packages/experiences:
+
 - GET /api/admin/{entity}: paginated list (page 1–100000, limit 1–50, default 20).
 - GET /api/admin/{entity}/:id: detail.
 - POST /api/admin/{entity}: create (201).
@@ -223,6 +252,7 @@ npm test
 ## Lead notifications
 
 SMTP is **disabled by default**. The API starts and captures leads normally without mail credentials, and startup reports enabled:false rather than pretending delivery. Enable only after configuring server/.env or a secret manager:
+
 ```text
 SMTP_ENABLED=true
 SMTP_HOST=<your SMTP host>
@@ -233,6 +263,7 @@ SMTP_PASSWORD=<optional authentication password>
 LEAD_NOTIFICATION_TO=<admin recipient email>
 MAIL_FROM=<verified sender email>
 ```
+
 These are configuration concepts, not usable credentials. If authentication is needed, provide both user/password. SMTP_SECURE=true uses implicit TLS (typically port 465); false requires STARTTLS. TLS certificate verification remains enabled. Transport logging/debug is disabled, timeouts are bounded, and file/URL content loading is disabled. See [Nodemailer SMTP documentation](https://nodemailer.com/smtp).
 
 Enquiry, booking and contact leads are stored first; the success response finishes before the notification service runs. Newsletter and honeypot submissions do not notify admins. Notifications contain useful lead/contact/travel information and linked package/destination names, using escaped HTML plus plain text; they omit hashes, cookies and secrets. Transport or enrichment failures log only a generic event and never reverse a saved lead or change its success response. SMTP acceptance is not proof of inbox delivery.

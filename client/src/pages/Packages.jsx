@@ -24,6 +24,10 @@ export default function Packages() {
   );
   const [params, setParams] = useSearchParams();
   const search = params.toString();
+  // Router navigation can settle after another input event. Preserve edits made
+  // in that interval while still accepting back/forward navigation on render.
+  const latestSearch = useRef(search);
+  latestSearch.current = search;
   const { values, errors, query, page } = readPackageQuery(search);
   const invalid = Object.keys(errors).length > 0;
   const loader = useCallback((signal) => getPackages(query, signal), [query]);
@@ -60,10 +64,14 @@ export default function Packages() {
   }, [resource.loading, resource.data, page]);
   function update(key, value) {
     requestedPageFocus.current = key === "page";
-    setParams(updatePackageQuery(search, { [key]: value }));
+    latestSearch.current = updatePackageQuery(latestSearch.current, {
+      [key]: value,
+    }).toString();
+    setParams(latestSearch.current);
   }
   function clear() {
     requestedPageFocus.current = false;
+    latestSearch.current = "";
     setParams({});
   }
   function field(key, label, type = "select", options = []) {
@@ -127,7 +135,11 @@ export default function Packages() {
         breadcrumbs={[{ label: "Packages" }]}
       />
       <section className="section container">
-        <div className={styles.chips} role="group" aria-label="Filter packages by category">
+        <div
+          className={styles.chips}
+          role="group"
+          aria-label="Filter packages by category"
+        >
           {[["", "All"], ...categories].map(([value, label]) => (
             <button
               className={styles.chip}

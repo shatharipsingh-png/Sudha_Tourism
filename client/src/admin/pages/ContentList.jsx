@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from "react";
+import { formatPrice } from "../../utils/forms";
 import { Link, useLocation } from "react-router-dom";
 import Image from "../../components/common/Image";
 import { getDestinations } from "../../api/api";
@@ -162,9 +163,7 @@ export default function ContentList({ kind }) {
                           <td data-label="Price">
                             <div>
                               {item.duration_days} days
-                              <small>
-                                ₹{Number(item.price).toLocaleString("en-IN")}
-                              </small>
+                              <small>{formatPrice(item.price)}</small>
                             </div>
                           </td>
                           <td data-label="Status">

@@ -13,7 +13,7 @@ let dbCalls;
 let execute;
 let query;
 function api(method, path, address = `192.0.2.${ip++}`) {
-  return request(app)[method](path).set('X-Forwarded-For', address);
+  return request(app)[method](path).set('Origin', env.CLIENT_URL).set('X-Forwarded-For', address);
 }
 beforeEach(() => {
   dbCalls = [];
@@ -213,7 +213,7 @@ test('request logs exclude queries, cookies and body data', async () => {
   await api('get', '/api/health?email=SECRET').set('Cookie', 'SECRET');
   assert.equal(logs.length, 1);
   const record = JSON.parse(logs[0]);
-  assert.deepEqual(Object.keys(record).sort(), ['durationMs', 'method', 'path', 'status']);
+  assert.deepEqual(Object.keys(record).sort(), ['durationMs', 'method', 'path', 'requestId', 'status']);
   assert.equal(record.path, '/api/health');
   assert.equal(logs[0].includes('SECRET'), false);
 });

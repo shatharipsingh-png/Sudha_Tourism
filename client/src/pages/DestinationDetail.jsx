@@ -26,6 +26,18 @@ export default function DestinationDetail() {
       ? "Page not found"
       : d?.name || "Destination",
     d?.short_desc || "Explore destinations in North India with Sudha Tourism.",
+    {
+      image: d?.image,
+      robots: resource.error ? "noindex,nofollow" : undefined,
+      destination: d,
+      breadcrumbs: d
+        ? [
+            { label: "Home", path: "/" },
+            { label: "Destinations", path: "/destinations" },
+            { label: d.name, path: `/destinations/${d.slug}` },
+          ]
+        : undefined,
+    },
   );
   const { openEnquiry } = useEnquiry();
   if (!d || resource.loading || resource.error)

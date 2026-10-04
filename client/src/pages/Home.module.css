@@ -1,0 +1,335 @@
+.hero {
+  position: relative;
+  min-height: 760px;
+  background: #3c463b;
+  color: white;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 160px 0 140px;
+}
+.heroImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 50%;
+}
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, #101c19cf 0%, #101c1970 55%, #101c191a 100%),
+    linear-gradient(0deg, #101c195c, transparent 55%);
+}
+.heroContent {
+  position: relative;
+}
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.19em;
+  font-size: 0.69rem;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+.hero h1 {
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  margin-bottom: 24px;
+}
+.hero h1 em {
+  font-weight: 400;
+}
+.heroDescription {
+  max-width: 440px;
+  color: #f0eee8;
+  line-height: 1.85;
+  font-size: 1rem;
+  margin-bottom: 30px;
+}
+.heroActions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.heroCaption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.72rem;
+  color: #eee9dd;
+  margin-top: 55px;
+}
+.heroCaption span {
+  width: 26px;
+  height: 1px;
+  background: #eee9dd;
+}
+.plannerWrap {
+  position: relative;
+  margin-top: -56px;
+  z-index: 2;
+}
+.destinationGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+.packageGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 26px;
+}
+.cardSkeleton {
+  height: 360px;
+  border-radius: var(--radius);
+}
+.principles {
+  background: var(--color-beige);
+  padding: 78px 0;
+}
+.valueGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px;
+}
+.value {
+  text-align: center;
+  padding: 10px 8px;
+}
+.value > svg {
+  color: var(--color-accent-dark);
+  margin-bottom: 20px;
+}
+.value h3 {
+  font-size: 1.28rem;
+  margin-bottom: 12px;
+}
+.value p,
+.respectCard p {
+  font-size: 0.86rem;
+  color: var(--color-muted);
+  line-height: 1.8;
+}
+.respect {
+  background: #eeeae1;
+}
+.respectInner {
+  display: grid;
+  grid-template-columns: 0.9fr 1.5fr;
+  gap: 80px;
+  align-items: center;
+}
+.sectionEyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.68rem;
+  color: var(--color-accent-dark);
+  font-weight: 600;
+  margin-bottom: 22px;
+}
+.respect h2 {
+  font-size: clamp(2.8rem, 4.5vw, 4.4rem);
+  line-height: 1.17;
+}
+.respect h2 em {
+  font-weight: 400;
+  color: var(--color-accent-dark);
+}
+.respectIntro {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  max-width: 270px;
+  margin-top: 26px;
+  line-height: 1.8;
+}
+.respectGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px 32px;
+}
+.respectCard {
+  padding-top: 20px;
+  border-top: 1px solid #d2cbbc;
+}
+.respectCard > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--color-accent-dark);
+  margin-bottom: 22px;
+}
+.respectCard > div span {
+  font-size: 0.7rem;
+}
+.respectCard h3 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
+.finalCta {
+  position: relative;
+  min-height: 470px;
+  display: flex;
+  align-items: center;
+  background: #334138;
+  color: white;
+  padding: 84px 0;
+  overflow: hidden;
+}
+.ctaImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ctaOverlay {
+  position: absolute;
+  inset: 0;
+  background: #122c22b8;
+}
+.ctaContent {
+  position: relative;
+  text-align: center;
+}
+.ctaContent h2 {
+  font-size: clamp(2rem, 3.7vw, 3.5rem);
+  line-height: 1.25;
+}
+.ctaContent > p:not(.eyebrow) {
+  font-size: 0.93rem;
+  margin: 22px 0 28px;
+  color: #e4e9e3;
+}
+.ctaContent .heroActions {
+  justify-content: center;
+}
+@media (max-width: 1100px) {
+  .destinationGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .respectInner {
+    gap: 48px;
+  }
+  .valueGrid {
+    gap: 16px;
+  }
+}
+@media (max-width: 900px) {
+  .hero {
+    min-height: 700px;
+    padding: 135px 0 155px;
+  }
+  .packageGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .packageGrid > article:last-child {
+    grid-column: 1/-1;
+    max-width: calc(50% - 13px);
+    width: 100%;
+    justify-self: center;
+  }
+  .valueGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+  .respectInner {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .respectInner > div:first-child {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .respectIntro {
+    align-self: end;
+  }
+  .respect h2 {
+    font-size: 3rem;
+  }
+  .heroOverlay {
+    background: linear-gradient(90deg, #101c19d6, #101c195e);
+  }
+}
+@media (max-width: 540px) {
+  .hero {
+    min-height: 630px;
+    padding: 125px 0 100px;
+  }
+  .hero h1 {
+    font-size: 3.3rem;
+  }
+  .heroDescription {
+    font-size: 0.92rem;
+    max-width: 320px;
+  }
+  .heroCaption {
+    margin-top: 32px;
+    font-size: 0.65rem;
+  }
+  .eyebrow {
+    font-size: 0.62rem;
+    letter-spacing: 0.13em;
+  }
+  .heroActions {
+    gap: 12px;
+  }
+  .heroActions > a,
+  .heroActions > button {
+    padding-inline: 16px;
+    font-size: 0.8rem;
+  }
+  .plannerWrap {
+    margin-top: -30px;
+  }
+  .destinationGrid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .packageGrid {
+    grid-template-columns: 1fr;
+  }
+  .packageGrid > article:last-child {
+    grid-column: auto;
+    max-width: none;
+  }
+  .valueGrid {
+    gap: 26px 16px;
+  }
+  .value {
+    padding: 0;
+  }
+  .value h3 {
+    font-size: 1.16rem;
+  }
+  .value p {
+    font-size: 0.8rem;
+  }
+  .principles {
+    padding: 56px 0;
+  }
+  .respectInner > div:first-child {
+    display: block;
+  }
+  .respectIntro {
+    max-width: 100%;
+  }
+  .respectGrid {
+    gap: 24px 20px;
+  }
+  .respectCard h3 {
+    font-size: 1.2rem;
+  }
+  .respectCard p {
+    font-size: 0.8rem;
+  }
+  .finalCta {
+    padding: 64px 0;
+    min-height: 440px;
+  }
+  .ctaContent h2 br {
+    display: none;
+  }
+}

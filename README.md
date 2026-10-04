@@ -1,8 +1,46 @@
 # Sudha Tourism
 
 Current: **server/ = Node + Express 4 + JavaScript + mysql2/promise + MySQL 8+**.
-Upcoming: **client/ = React + Vite + JavaScript + CSS Modules**. No client is built in Phase 1.
+Public frontend: **client/ = React + Vite + JavaScript + CSS Modules**. Phase 3 provides Home, shared components and intentional placeholders for Phase 4 pages.
 Reusable draft copy and UI ideas are preserved in [project notes](docs/preserved-project-notes.md); these include unverified placeholders, not approved business facts.
+
+## Public frontend (Phase 3)
+
+Use Node **20.19+ in the Node 20 line, or 22.12+** for Vite 8. The backend remains compatible with Node 20+.
+Start the API and frontend in separate terminals:
+
+```sh
+cd server
+npm install
+npm run dev
+```
+
+```sh
+cd client
+npm install
+npm run dev
+```
+
+Open **http://localhost:5173**. Frontend port: **5173**; backend port: **5000**. Keep the backend's `CLIENT_URL` set to the exact frontend browser origin. Vite forwards relative `/api` requests to `http://localhost:5000`. No frontend environment file is necessary and no server secrets belong in `VITE_*` variables.
+
+```sh
+cd client
+npm test
+npm run build
+npm run preview
+```
+
+`npm test` uses Node's built-in test runner for API error handling and lead payload mapping. Playwright is a development-only dependency for browser verification. With the API and Vite running, install its browser once using `npx playwright install chromium`, then run `npm run test:browser`. Alternatively set `CHROMIUM_PATH` to an existing compatible Chrome executable. The browser smoke check is read-only and covers responsive layout, dialogs, planner URLs, safe error/retry and 404 metadata. `VERIFY_URL` optionally selects another local frontend origin. `npm run preview` serves the built files locally; it is not a production server.
+
+Production should serve `client/dist` with SPA fallback to `index.html` for frontend routes, and reverse-proxy `/api` to Express on the same public origin. The Vite development proxy is not part of the production build. Do not route `/api` errors to the SPA fallback. Use HTTPS and set the backend's `CLIENT_URL` to the real public origin.
+
+Update **client/src/config/site.js** with approved phone, email, address, hours, WhatsApp, social URLs, stats and `canonicalOrigin`. Unknown values are explicitly `PLACEHOLDER`; unconfigured contact links, stats and WhatsApp are hidden. Canonical tags are omitted until a real origin is supplied. Replace development Unsplash images with approved imagery before launch, and review seeded package prices/content. No logo, ratings, testimonials or business statistics have been invented.
+
+Home and 404 are implemented. Destination/package lists and details, Experiences, About, Contact, Privacy, Terms and Cancellation are intentional placeholders for Phase 4. The planner saves supported filters in the packages URL; results belong to Phase 4. Legal pages need approved policies before a public launch.
+
+Google Fonts load with `display=swap` and local fallbacks. The **frontend host's** CSP must account for styles from `https://fonts.googleapis.com`, fonts from `https://fonts.gstatic.com`, and current imagery from `https://images.unsplash.com`. Keep API `connect-src` same-origin. Framer Motion applies dynamic inline style attributes; configure the frontend style policy accordingly or replace/self-host assets and animations under a stricter policy. Express's API-only Helmet configuration does not automatically configure a separate static frontend host. No backend security settings were weakened.
+
+Newsletter submission includes explicit `consent: true`, as required by the existing backend. The shared enquiry dialog submits the established `type: enquiry` payload and does not create a booking. API errors are presented with safe user-facing messages.
 
 ## Requirements and local setup
 
@@ -165,6 +203,6 @@ These are configuration concepts, not usable credentials. If authentication is n
 
 Enquiry, booking and contact leads are stored first; the success response finishes before the notification service runs. Newsletter and honeypot submissions do not notify admins. Notifications contain useful lead/contact/travel information and linked package/destination names, using escaped HTML plus plain text; they omit hashes, cookies and secrets. Transport or enrichment failures log only a generic event and never reverse a saved lead or change its success response. SMTP acceptance is not proof of inbox delivery.
 
-The notification boundary supports adding channels later. This phase is best-effort in-process notification: no durable queue, retry mechanism or delivery guarantee. Process shutdown/crash can lose a pending notification; review saved leads through the admin API. No WhatsApp, Redis, uploads, analytics, payments or frontend is implemented.
+The notification boundary supports adding channels later. This phase is best-effort in-process notification: no durable queue, retry mechanism or delivery guarantee. Process shutdown/crash can lose a pending notification; review saved leads through the admin API. No WhatsApp Business API, Redis, uploads, analytics or payments are implemented. The Phase 3 frontend can use a direct WhatsApp link after a real number is configured.
 
 Automated notification tests use only fake transports and disable environment SMTP. Live temporary CRUD verification also disables mail so test records cannot send real email. Real provider/inbox delivery requires separate operator verification.

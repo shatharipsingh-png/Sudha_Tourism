@@ -1,0 +1,71 @@
+.planner {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 0.85fr auto;
+  align-items: center;
+  gap: 24px;
+  background: white;
+  color: var(--color-text);
+  padding: 28px 32px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+.field {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  border-right: 1px solid var(--color-border);
+  padding-right: 16px;
+}
+.field label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.field select {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  padding: 8px 20px 8px 0;
+  min-height: 38px;
+  cursor: pointer;
+}
+.retry {
+  background: none;
+  border: 0;
+  text-align: left;
+  color: var(--color-accent-dark);
+  text-decoration: underline;
+  font-size: 0.75rem;
+  padding: 4px 0;
+}
+@media (max-width: 900px) {
+  .planner {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .field:nth-child(2) {
+    border: 0;
+  }
+  .planner > button {
+    width: 100%;
+  }
+}
+@media (max-width: 540px) {
+  .planner {
+    grid-template-columns: 1fr;
+    padding: 24px;
+    gap: 16px;
+  }
+  .field {
+    border: 0;
+    border-bottom: 1px solid var(--color-border);
+    padding: 0 0 8px;
+  }
+  .field:nth-child(2) {
+    border-bottom: 1px solid var(--color-border);
+  }
+}

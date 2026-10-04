@@ -1,0 +1,41 @@
+:root {
+  --color-background: #faf7f2;
+  --color-text: #1f2328;
+  --color-muted: #62645f;
+  --color-accent: #d9622b;
+  --color-accent-dark: #ac4218;
+  --color-card: #ffffff;
+  --color-border: #e4ddd2;
+  --color-cream: #f0e9de;
+  --color-beige: #f0e9de;
+  --color-footer: #1c2e2a;
+  --color-footer-muted: #c2cec6;
+  --font-heading: "Playfair Display", Georgia, serif;
+  --font-body: "Inter", Arial, sans-serif;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --container-width: 1240px;
+  --container-padding: clamp(1.25rem, 4vw, 3rem);
+  --radius: 14px;
+  --radius-small: 8px;
+  --shadow: 0 8px 32px rgb(31 35 40 / 6%);
+  --shadow-card: 0 8px 32px rgb(31 35 40 / 6%);
+  --shadow-raised: 0 16px 44px rgb(31 35 40 / 12%);
+  --transition: 180ms ease;
+  --header-height: 88px;
+  --z-header: 20;
+  --z-whatsapp: 25;
+  --z-dialog: 50;
+}
+@media (max-width: 767px) {
+  :root {
+    --header-height: 74px;
+  }
+}

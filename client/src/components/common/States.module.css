@@ -1,0 +1,34 @@
+.skeleton {
+  height: 330px;
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, #eae3d9 25%, #f4eee6 50%, #eae3d9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s linear infinite;
+}
+.state {
+  padding: 3rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+.state svg {
+  color: var(--color-accent-dark);
+  margin-bottom: 0.75rem;
+}
+.state p {
+  color: var(--color-muted);
+}
+.state h3 {
+  font-size: 1.5rem;
+}
+.page {
+  min-height: 55vh;
+  padding: 8rem 1rem;
+  text-align: center;
+  color: var(--color-muted);
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}

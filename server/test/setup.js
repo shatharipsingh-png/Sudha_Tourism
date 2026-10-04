@@ -9,6 +9,8 @@ Object.assign(process.env, {
 });
 delete process.env.ADMIN_EMAIL;
 delete process.env.ADMIN_PASSWORD;
+process.env.SMTP_ENABLED = 'false';
+for (const key of ['SMTP_HOST','SMTP_PORT','SMTP_SECURE','SMTP_USER','SMTP_PASSWORD','LEAD_NOTIFICATION_TO','MAIL_FROM']) delete process.env[key];
 const { pool } = await import('../src/db/pool.js');
 for (const method of ['execute', 'query', 'getConnection']) {
   pool[method] = async () => { throw new Error('Real database access prohibited in tests.'); };

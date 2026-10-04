@@ -104,7 +104,7 @@ export const packageData = [
     ],
     inclusions: ['Accommodation in selected category', 'Daily breakfast', 'Private transfers for the itinerary', 'Driver allowances and tolls', 'Sightseeing as listed'],
     exclusions: ['Flights and train tickets', 'Monument entry fees unless specified', 'Lunches and dinners', 'Personal expenses', 'Travel insurance'],
-    info: { important: ['DEMO PRICES — edit before launch.', 'Travel times can change with traffic and road conditions.'], tips: ['Carry comfortable walking shoes.', 'Reserve heritage monument tickets where available.'] }
+    info: { important: ['Travel times can change with traffic and road conditions.'], tips: ['Carry comfortable walking shoes.', 'Reserve heritage monument tickets where available.'] }
   },
   {
     slug: 'uttarakhand-devbhoomi-yatra', title: 'Uttarakhand Devbhoomi Yatra', destination: 'uttarakhand', route: 'Haridwar · Rishikesh · Devprayag · Kedarnath region · Badrinath', category: 'spiritual', duration_days: 6, price: 28999, best_seller: false, featured: true,
@@ -120,7 +120,7 @@ export const packageData = [
     ],
     inclusions: ['Accommodation in selected category', 'Breakfast and dinner where specified', 'Road transfers', 'Driver allowances and tolls', 'Basic itinerary coordination'],
     exclusions: ['Helicopter or special transport', 'Temple donations', 'Personal porter charges', 'Travel insurance', 'Meals not listed'],
-    info: { important: ['DEMO PRICES — edit before launch.', 'High-altitude routes are subject to weather, government advisories and local access rules.', 'Kedarnath and Badrinath access is seasonal.'], tips: ['Carry warm layers and rain protection.', 'Allow buffer days for mountain travel.'] }
+    info: { important: ['High-altitude routes are subject to weather, government advisories and local access rules.', 'Kedarnath and Badrinath access is seasonal.'], tips: ['Carry warm layers and rain protection.', 'Allow buffer days for mountain travel.'] }
   },
   {
     slug: 'chopta-tungnath-trek', title: 'Chopta Tungnath Trek', destination: 'uttarakhand', route: 'Rishikesh · Rudraprayag · Chopta · Tungnath · Chandrashila', category: 'adventure', duration_days: 4, price: 15999, best_seller: false, featured: false,
@@ -134,7 +134,7 @@ export const packageData = [
     ],
     inclusions: ['Accommodation', 'Breakfast', 'Road transfers', 'Trek coordination', 'Driver and vehicle costs'],
     exclusions: ['Trekking equipment rental', 'Personal porter', 'Travel insurance', 'Meals not listed', 'Emergency evacuation costs'],
-    info: { important: ['DEMO PRICES — edit before launch.', 'Trek access and weather conditions must be checked before departure.'], tips: ['Use sturdy trekking footwear.', 'Hydrate and pace yourself at altitude.'] }
+    info: { important: ['Trek access and weather conditions must be checked before departure.'], tips: ['Use sturdy trekking footwear.', 'Hydrate and pace yourself at altitude.'] }
   },
   {
     slug: 'himachal-scenic-escape', title: 'Himachal Scenic Escape', destination: 'himachal-pradesh', route: 'Delhi · Shimla · Manali', category: 'family', duration_days: 6, price: 24999, best_seller: false, featured: true,
@@ -150,7 +150,7 @@ export const packageData = [
     ],
     inclusions: ['Accommodation', 'Breakfast', 'Private road transfers', 'Sightseeing as listed', 'Driver costs'],
     exclusions: ['Adventure activity charges', 'Lunch and dinner', 'Entry tickets', 'Travel insurance', 'Personal expenses'],
-    info: { important: ['DEMO PRICES — edit before launch.', 'High-altitude and excursion access varies by weather and local restrictions.'], tips: ['Carry warm layers year-round for mountain evenings.', 'Keep the itinerary flexible in case of road delays.'] }
+    info: { important: ['High-altitude and excursion access varies by weather and local restrictions.'], tips: ['Carry warm layers year-round for mountain evenings.', 'Keep the itinerary flexible in case of road delays.'] }
   },
   {
     slug: 'manali-honeymoon-retreat', title: 'Manali Honeymoon Retreat', destination: 'himachal-pradesh', route: 'Delhi · Manali · Solang Valley', category: 'honeymoon', duration_days: 5, price: 27999, best_seller: false, featured: false,
@@ -165,7 +165,7 @@ export const packageData = [
     ],
     inclusions: ['Accommodation', 'Breakfast', 'Private transfers', 'Sightseeing as listed', 'Driver costs'],
     exclusions: ['Flights or bus tickets', 'Adventure activities', 'Lunch and dinner', 'Entry fees', 'Travel insurance'],
-    info: { important: ['DEMO PRICES — edit before launch.', 'Room category and seasonal rates should be confirmed before booking.'], tips: ['Confirm weather before high-altitude excursions.', 'Reserve preferred room category early during peak periods.'] }
+    info: { important: ['Room category and seasonal rates should be confirmed before booking.'], tips: ['Confirm weather before high-altitude excursions.', 'Reserve preferred room category early during peak periods.'] }
   },
   {
     slug: 'delhi-agra-amritsar-tour', title: 'Delhi Agra Amritsar Tour', destination: 'delhi', route: 'Delhi · Agra · Delhi · Amritsar', category: 'cultural', duration_days: 6, price: 25999, best_seller: true, featured: false,
@@ -181,7 +181,7 @@ export const packageData = [
     ],
     inclusions: ['Accommodation', 'Breakfast', 'Private transfers', 'Sightseeing as listed', 'Driver costs'],
     exclusions: ['Train tickets unless specified', 'Monument entry fees', 'Meals not listed', 'Travel insurance', 'Personal expenses'],
-    info: { important: ['DEMO PRICES — edit before launch.', 'Taj Mahal is closed to visitors on Fridays; schedule accordingly.'], tips: ['Start Taj Mahal sightseeing early.', 'Dress respectfully at the Golden Temple.'] }
+    info: { important: ['Taj Mahal is closed to visitors on Fridays; schedule accordingly.'], tips: ['Start Taj Mahal sightseeing early.', 'Dress respectfully at the Golden Temple.'] }
   },
   {
     slug: 'punjab-cultural-experience', title: 'Punjab Cultural Experience', destination: 'punjab', route: 'Amritsar · Attari · Patiala · Chandigarh', category: 'cultural', duration_days: 4, price: 16999, best_seller: false, featured: false,
@@ -195,7 +195,7 @@ export const packageData = [
     ],
     inclusions: ['Accommodation', 'Breakfast', 'Road transfers', 'Sightseeing as listed', 'Driver costs'],
     exclusions: ['Entry tickets', 'Lunch and dinner', 'Personal expenses', 'Travel insurance', 'Optional experiences'],
-    info: { important: ['DEMO PRICES — edit before launch.', 'Access to Chandigarh heritage sites can require advance permission.'], tips: ['Dress respectfully at religious sites.', 'Confirm border ceremony schedule before travel.'] }
+    info: { important: ['Access to Chandigarh heritage sites can require advance permission.'], tips: ['Dress respectfully at religious sites.', 'Confirm border ceremony schedule before travel.'] }
   }
 ];
 

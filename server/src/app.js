@@ -9,6 +9,7 @@ import adminRoutes from './routes/admin.js';
 import { globalRateLimit } from './middleware/rateLimits.js';
 import { notFound, errorHandler } from './middleware/errorHandler.js';
 import { requestLogger } from './middleware/requestLogger.js';
+import contentRoutes from './routes/content.js';
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use((req, res, next) => {
 app.use('/api', publicRoutes);
 app.use('/api', leadRoutes);
 app.use('/api', adminRoutes);
+app.use('/api', contentRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

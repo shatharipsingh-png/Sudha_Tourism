@@ -1,6 +1,7 @@
 import { pool } from '../db/pool.js';
 import { safeJsonParse } from '../utils/json.js';
 import { ok, fail } from '../utils/response.js';
+import { publicPackageInfo } from '../utils/publicContent.js';
 
 const cardFields = `p.id, p.slug, p.title, p.route, p.category, p.duration_days, p.price, p.rating, p.image, p.short_desc, p.best_seller, p.featured, d.name AS destination_name, d.slug AS destination_slug`;
 
@@ -37,6 +38,7 @@ export async function getPackage(req, res, next) {
     if (!rows.length) return fail(res, 404, 'Package not found.');
     const pkg = rows[0];
     for (const key of ['gallery', 'highlights', 'itinerary', 'inclusions', 'exclusions', 'info']) pkg[key] = safeJsonParse(pkg[key], key === 'info' ? {} : []);
+    pkg.info = publicPackageInfo(pkg.info);
     pkg.destination = { name: pkg.destination_name, slug: pkg.destination_slug };
     delete pkg.destination_name;
     delete pkg.destination_slug;

@@ -69,26 +69,3 @@ export async function listLeads(req, res, next) {
     }, 'Leads retrieved.');
   } catch (error) { next(error); }
 }
-
-export async function stats(req, res, next) {
-  try {
-    const [leadRows] = await pool.execute("SELECT type, COUNT(*) AS count FROM leads WHERE status = 'new' GROUP BY type");
-    const [packageRows] = await pool.execute("SELECT COUNT(*) AS count FROM packages WHERE status = 'published'");
-    const [destinationRows] = await pool.execute('SELECT COUNT(*) AS count FROM destinations');
-    const byType = { enquiry: 0, booking: 0, contact: 0, newsletter: 0 };
-    for (const row of leadRows) byType[row.type] = Number(row.count);
-    return ok(res, {
-      newLeadsByType: byType,
-      publishedPackages: Number(packageRows[0].count),
-      totalDestinations: Number(destinationRows[0].count)
-    }, 'Stats retrieved.');
-  } catch (error) { next(error); }
-}
-
-export async function updateLead(req, res, next) {
-  try {
-    const [result] = await pool.execute('UPDATE leads SET status = ? WHERE id = ?', [req.body.status, req.params.id]);
-    if (!result.affectedRows) return fail(res, 404, 'Lead not found.');
-    return ok(res, { id: Number(req.params.id), status: req.body.status }, 'Lead updated.');
-  } catch (error) { next(error); }
-}

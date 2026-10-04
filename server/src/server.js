@@ -1,8 +1,12 @@
 import app from './app.js';
 import { env } from './config/env.js';
 import { pool } from './db/pool.js';
+import { notifications } from './services/notifications/index.js';
 
-const server = app.listen(env.PORT, () => console.log(`Sudha Tourism API listening on port ${env.PORT}`));
+const server = app.listen(env.PORT, () => {
+  console.log(`Sudha Tourism API listening on port ${env.PORT}`);
+  console.log(JSON.stringify({event:'lead_notifications',enabled:notifications.enabled}));
+});
 let shuttingDown = false;
 
 function shutdown(reason, exitCode = 0) {

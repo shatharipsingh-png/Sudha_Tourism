@@ -119,3 +119,52 @@ Global: 300 requests/15 minutes/IP; leads: 5/10 minutes/IP; failed logins: 5/15 
 Helmet, 20 KB JSON bodies and bounded DB queues are enabled. Expected statuses: 400/401/403/404/413/429; unsupported encodings 415; unexpected failure generic 500. Logs record method, route template, status and duration, excluding queries, bodies, passwords, cookies, JWTs and SQL internals. IPs are salted hashes.
 SIGTERM/SIGINT close HTTP/pool with a ten-second bound. Fatal exceptions/rejections safely log event names and shut down.
 The pool assumes local/private trusted MySQL networking; remote database TLS is not configured. Configure transport security before an untrusted network, plus secret management, backups and restricted database users.
+
+## Phase 2 admin backend
+
+Create an administrator without running the catalog seed:
+```sh
+cd server
+npm run admin:create
+```
+Supply ADMIN_EMAIL and ADMIN_PASSWORD through the ignored server/.env or a secure process environment. Email is normalized. Password must have 12+ characters, uppercase, lowercase, a number and a symbol, and be <=72 UTF-8 bytes. Only a bcrypt cost-12 hash is stored. Existing emails fail safely; passwords are never silently reset. API startup does not require these variables. Remove seed/creation credentials from the deployment environment after use. Rotate any real credential previously placed in .env.example or committed to source control.
+
+Authenticated content endpoints for each of destinations/packages/experiences:
+- GET /api/admin/{entity}: paginated list (page 1–100000, limit 1–50, default 20).
+- GET /api/admin/{entity}/:id: detail.
+- POST /api/admin/{entity}: create (201).
+- PATCH /api/admin/{entity}/:id: supplied fields only; empty patches fail.
+- DELETE /api/admin/{entity}/:id: delete with consistent JSON success.
+
+Use the existing snake_case database fields. Text and arrays are bounded; images and gallery entries must be HTTP(S) URLs. Slugs normalize surrounding whitespace/case and spaces into hyphens. Unknown fields and uncontrolled JSON keys fail validation. Booleans accept true/false or their exact string equivalents; strings such as "yes" are rejected.
+
+Destination JSON: why_visit is a string array; top_places contains name/description and optional image; travel_info contains best_time/how_to_reach/tips. Package JSON: gallery is URL array; highlights/inclusions/exclusions are string arrays; itinerary entries contain unique day/title/description/activities; info contains important/tips arrays. Experience examples is a string array. Keep JSON bodies within the existing 20 KB limit.
+
+Admin package lists additionally filter by destination_id, category and status. Package status is draft/published; new admin-created packages default to draft. Public lists, detail, related packages and destination package lists show published packages only. Duplicate slugs return 409. Missing linked destinations return 400. Destination deletion is blocked when packages or leads reference it; package deletion is blocked when leads reference it. Parent rows are locked during deletion to avoid racing FK-backed writes. Historical leads are never cascade-deleted or silently unlinked by these APIs.
+
+GET /api/admin/leads/:id returns linked content and useful lead fields, excluding IP hashes. Existing list filtering/pagination remains. Status updates allow new -> contacted/closed, contacted -> closed, and closed -> contacted for reopening; identical status is a successful no-op. Other backwards transitions return 409. Concurrent updates use an optimistic status condition and return 409 if the record changed.
+
+Stats include totalLeads/newLeads/contactedLeads/closedLeads, leadsByType (all statuses), newLeadsByType, five recent leads, totalDestinations/totalPackages/publishedPackages/totalExperiences. Existing accurately named keys remain compatible.
+
+Prices and Unsplash imagery are illustrative development content. An owner must verify prices, route availability and business copy, and replace temporary images with owned/licensed production imagery before launch. No verified reviews or guarantees are introduced. Known Phase 1 demo-price warnings are removed from public package responses without overwriting existing database content; new seed content does not contain them.
+
+## Lead notifications
+
+SMTP is **disabled by default**. The API starts and captures leads normally without mail credentials, and startup reports enabled:false rather than pretending delivery. Enable only after configuring server/.env or a secret manager:
+```text
+SMTP_ENABLED=true
+SMTP_HOST=<your SMTP host>
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=<optional authentication user>
+SMTP_PASSWORD=<optional authentication password>
+LEAD_NOTIFICATION_TO=<admin recipient email>
+MAIL_FROM=<verified sender email>
+```
+These are configuration concepts, not usable credentials. If authentication is needed, provide both user/password. SMTP_SECURE=true uses implicit TLS (typically port 465); false requires STARTTLS. TLS certificate verification remains enabled. Transport logging/debug is disabled, timeouts are bounded, and file/URL content loading is disabled. See [Nodemailer SMTP documentation](https://nodemailer.com/smtp).
+
+Enquiry, booking and contact leads are stored first; the success response finishes before the notification service runs. Newsletter and honeypot submissions do not notify admins. Notifications contain useful lead/contact/travel information and linked package/destination names, using escaped HTML plus plain text; they omit hashes, cookies and secrets. Transport or enrichment failures log only a generic event and never reverse a saved lead or change its success response. SMTP acceptance is not proof of inbox delivery.
+
+The notification boundary supports adding channels later. This phase is best-effort in-process notification: no durable queue, retry mechanism or delivery guarantee. Process shutdown/crash can lose a pending notification; review saved leads through the admin API. No WhatsApp, Redis, uploads, analytics, payments or frontend is implemented.
+
+Automated notification tests use only fake transports and disable environment SMTP. Live temporary CRUD verification also disables mail so test records cannot send real email. Real provider/inbox delivery requires separate operator verification.

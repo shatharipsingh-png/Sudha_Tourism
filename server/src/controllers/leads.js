@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { pool } from '../db/pool.js';
 import { env } from '../config/env.js';
 import { ok, fail } from '../utils/response.js';
+import { notifications } from '../services/notifications/index.js';
 
 function hashIp(ip) {
   return crypto.createHash('sha256').update(`${ip}${env.IP_SALT}`).digest('hex');
@@ -53,6 +54,16 @@ export async function createLead(req, res, next) {
       hashIp(req.ip)
     ]);
 
+    const event = { ...input, id:result.insertId, created_at:new Date().toISOString() };
+    res.once('finish', () => {
+      // Work is scheduled after the saved lead's response; no transport error
+      // can propagate into the lead HTTP request or its database write.
+      setImmediate(() => {
+        Promise.resolve().then(() => notifications.leadCreated(event)).catch(() => {
+          console.error(JSON.stringify({event:'lead_notification_failed'}));
+        });
+      });
+    });
     return ok(res, { id: result.insertId }, 'Lead received.');
   } catch (error) { next(error); }
 }
